@@ -1129,70 +1129,7 @@ td { color: rgba(220,235,248,0.90) !important; }
   </div>
 </div>
 
-<!-- ================================================================
-     P-E #05 — EDIT TRANSACTION MODAL (Principal only)
-     ================================================================ -->
-<div id="editTxOverlay" class="modal-overlay">
-  <div class="modal modal-lg" id="editTxModal">
-    <div class="modal-hdr">
-      <span class="modal-title">✏ Edit Fee Record</span>
-      <button class="modal-close" onclick="closeEditTxModal()">×</button>
-    </div>
-    <div class="modal-body">
-      <div id="editTxAlert"></div>
-      <input type="hidden" id="editTxId">
-      <input type="hidden" id="editTxStudentId">
-      <div class="form-row" style="margin-bottom:16px">
-        <div class="form-group">
-          <label class="form-label">Fee Head <span style="color:var(--danger)">*</span></label>
-          <select class="form-control" id="editTxFeeHead">
-            <option value="Monthly Tuition Fee">Monthly Tuition Fee</option>
-            <option value="Admission Fee">Admission Fee</option>
-            <option value="Exam Fee">Exam Fee</option>
-            <option value="Transport Fee">Transport Fee</option>
-            <option value="Library Fee">Library Fee</option>
-            <option value="Sports Fee">Sports Fee</option>
-            <option value="Miscellaneous">Miscellaneous</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Amount Paid (₹) <span style="color:var(--danger)">*</span></label>
-          <input type="number" class="form-control" id="editTxAmount" min="0" step="1">
-        </div>
-      </div>
-      <div class="form-row" style="margin-bottom:16px">
-        <div class="form-group">
-          <label class="form-label">Payment Mode <span style="color:var(--danger)">*</span></label>
-          <select class="form-control" id="editTxMode">
-            <option value="Cash">Cash</option>
-            <option value="UPI">UPI</option>
-            <option value="Bank Transfer">Bank Transfer</option>
-            <option value="Cheque">Cheque</option>
-            <option value="DD">DD</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Payment Date <span style="color:var(--danger)">*</span></label>
-          <input type="date" class="form-control" id="editTxDate" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Notes / Remarks</label>
-        <textarea class="form-control" id="editTxNotes" rows="2" placeholder="Optional notes..."></textarea>
-      </div>
-      <div style="padding:10px 14px;background:rgba(212,150,42,0.10);border:1px solid rgba(212,150,42,0.25);border-radius:8px;font-size:12px;color:var(--warn);margin-top:4px">
-        ⚠ Editing a fee record updates only the fields above. Receipt number, student info, and month tags remain unchanged. Balance will be recalculated automatically.
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeEditTxModal()">Cancel</button>
-      <button class="btn btn-primary" id="editTxSaveBtn" onclick="saveEditedTx()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Save Changes
-      </button>
-    </div>
-  </div>
-</div>
+<!-- VLX-REF-002: Edit Transaction Modal removed — Edit functionality disabled for all roles -->
 
 <!-- ================================================================
      MAIN APP
@@ -2045,7 +1982,7 @@ function _secDdGet(prefix) {
    ============================================================ */
 window.addEventListener('load', () => {
   updateHeaderDate();
-  setInterval(updateHeaderDate, 60000);
+  setInterval(updateHeaderDate, 1000); // VLX-REF-003 FIX: update every second for real-time display
 
   // P-A #15: Splash removed — go straight to auth
   initAuth();
@@ -2053,9 +1990,10 @@ window.addEventListener('load', () => {
 
 function updateHeaderDate() {
   const d = new Date();
-  // BUG-N18 FIX: Guard against null — #hdrDate may not exist if app shell is hidden on slow/errored renders.
+  // VLX-REF-003 FIX: Display live date+time in the header pill (no cached/static value)
   const el = document.getElementById('hdrDate');
-  if (el) el.textContent = d.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'});
+  if (el) el.textContent = d.toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'})
+    + ' · ' + d.toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:true});
 }
 
 function initAuth() {
@@ -2405,7 +2343,7 @@ function renderSidebar() {
     { id:'recordFee',    label:'Record Payment',        icon:iconFee },
     { id:'finance',      label:'Paid Fee',              icon:iconFinance },
     { id:'concessions',  label:'CONCESSION MANAGEMENT', icon:iconConcession, locked:true },
-    { id:'excused',      label:'EXCUSED MANAGEMENT',    icon:iconExcused, locked:true },
+    { id:'excused',      label:'FEES EXCUSED STUDENTS',    icon:iconExcused, locked:true },
     { id:'pendingFee',   label:'DUE FEE',               icon:iconPendingFee, locked:true },
     { id:'hidden',       label:'HIDDEN STUDENT',        icon:iconHidden, locked:true },
     { id:'terminated',   label:'TERMINATED',            icon:iconTerminated, locked:true },
@@ -2422,7 +2360,7 @@ function renderSidebar() {
     { id:'pastDue',      label:'Record Previous Year Dues', icon:iconPastDue },
     { id:'finance',      label:'Paid Fee',              icon:iconFinance },
     { id:'concessions',  label:'CONCESSION MANAGEMENT', icon:iconConcession },
-    { id:'excused',      label:'EXCUSED MANAGEMENT',    icon:iconExcused },
+    { id:'excused',      label:'FEES EXCUSED STUDENTS',    icon:iconExcused },
     { id:'pendingFee',   label:'DUE FEE',               icon:iconPendingFee },
     { id:'hidden',       label:'HIDDEN STUDENT',        icon:iconHidden },
     { id:'terminated',   label:'TERMINATED',            icon:iconTerminated },
@@ -2520,6 +2458,8 @@ function navigate(view, params={}, pushToStack=true) {
   setActiveNav(view);
   updateBackBtn();
   closeSidebar(); // BUG-L04 FIX: auto-close sidebar on mobile after navigation
+  // LIVE-PROFILE: detach profile snapshot listeners when navigating away
+  _detachProfileListeners();
   renderView(view, params);
 }
 
@@ -2527,6 +2467,8 @@ function goBack() {
   if (navStack.length === 0) return;
   // CHG-013: Detach dashboard listeners when leaving dashboard via back
   if (currentView === 'dashboard') _detachDashListeners();
+  // LIVE-PROFILE: detach profile snapshot listeners on back
+  _detachProfileListeners();
   const prev = navStack.pop();
   currentView = prev.view;
   setActiveNav(prev.view);
@@ -2544,6 +2486,8 @@ function pushNav(view, params={}) {
   if (_isSessionExpired()) { doLogout(); return; } // BUG-M02 FIX
   // CHG-013: Detach dashboard listeners when leaving dashboard via pushNav
   if (currentView === 'dashboard' && view !== 'dashboard') _detachDashListeners();
+  // LIVE-PROFILE: detach profile snapshot listeners on pushNav
+  _detachProfileListeners();
   navStack.push({ view:currentView, params:{} });
   currentView = view;
   updateBackBtn();
@@ -2551,6 +2495,13 @@ function pushNav(view, params={}) {
 }
 
 function setContent(html) {
+  // BUG-FIX (VLX013→VLX014): Explicitly stop the dashboard clock before replacing the
+  // DOM. Without this, the setInterval tick fires after innerHTML wipes clockTime,
+  // finds the element missing, self-clears _clockInterval to null — then
+  // renderDigitalClock (called after setContent in renderPrincipalDash) tries to
+  // clear a null interval, starts a new one, but the next tick still races with
+  // the old pending microtask. Clearing here gives a clean slate every time.
+  if (_clockInterval) { clearInterval(_clockInterval); _clockInterval = null; }
   document.getElementById('content').innerHTML = html;
 }
 
@@ -2584,7 +2535,7 @@ function renderView(view, params) {
     case 'profile':       return renderProfile();
     case 'pendingFee':    return renderPendingFee();   // PHASE 12 #11
     case 'excused':        return (currentRole !== 'principal')
-                            ? setContent('<div class="alert alert-danger" style="margin:24px">🔒 Access denied — Excused Section is Principal only.</div>')
+                            ? setContent('<div class="alert alert-danger" style="margin:24px">🔒 Access denied — Fees Excused Students is Principal only.</div>')
                             : renderExcusedSection(params);  // ARC-019
     case 'feeOnboarding':  return renderFeeStructure(); // Point 14: Fee Category module removed — redirect to Fee Structure
     case 'concessions':
@@ -2604,6 +2555,13 @@ window._dashListeners = window._dashListeners || [];
 function _detachDashListeners() {
   (window._dashListeners || []).forEach(unsub => { try { unsub(); } catch(_){} });
   window._dashListeners = [];
+}
+
+// LIVE-PROFILE: onSnapshot listeners for student profile — detached on navigate away
+window._profileListeners = window._profileListeners || [];
+function _detachProfileListeners() {
+  (window._profileListeners || []).forEach(unsub => { try { unsub(); } catch(_){} });
+  window._profileListeners = [];
 }
 
 /* CHG-013: CSS for the gold pulse "live" indicator dot */
@@ -2795,8 +2753,22 @@ async function renderPrincipalDash() {
   // so exports always get a fresh full fetch from ensureExportData().
   let _dashRecentTx = [];
   try {
+    // Use date desc (indexed) — same as Paid Fee and all other tx queries.
+    // For same-date entries (e.g. excused + payment recorded in the same session),
+    // do a secondary client-side sort by createdAt so the most-recently-saved doc
+    // always floats to the top, regardless of user-picked date field.
     const txSnap = await schoolCol('feeTransactions').orderBy('date','desc').limit(200).get();
-    _dashRecentTx = txSnap.docs.map(d=>({id:d.id,...d.data()}));
+    const _raw = txSnap.docs.map(d => _normalizeTx({id:d.id,...d.data()}));
+    // Secondary sort: among docs with identical date-seconds, newer createdAt wins
+    _raw.sort((a, b) => {
+      const da = a.date?.toMillis ? a.date.toMillis() : (a.date ? new Date(a.date).getTime() : 0);
+      const db = b.date?.toMillis ? b.date.toMillis() : (b.date ? new Date(b.date).getTime() : 0);
+      if (db !== da) return db - da; // primary: date desc
+      const ca = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+      const cb = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+      return cb - ca; // secondary: createdAt desc (most recently saved on top)
+    });
+    _dashRecentTx = _raw;
   } catch(_) { _dashRecentTx = []; }
   const recentTx = _dashRecentTx.slice(0,10);
 
@@ -3923,18 +3895,16 @@ function _updateStudentTableTitle(list, query='') {
    STUDENT PROFILE
    ============================================================ */
 async function renderStudentProfile(id, preloaded) {
+  // LIVE-PROFILE: detach any existing profile listeners before starting fresh
+  _detachProfileListeners();
   setContent(`<div class="loader-wrap"><div class="spinner"></div></div>`);
-  try {
-    let s = preloaded;
-    if (!s) {
-      const doc = await schoolCol('students').doc(id).get();
-      if (!doc.exists) { setContent('<div class="alert alert-danger">Student not found.</div>'); return; }
-      s = { id:doc.id, ...doc.data() };
-    }
 
-    const txSnap = await schoolCol('feeTransactions').where('studentId','==',id).get();
-    const transactions = txSnap.docs.map(d=>({id:d.id,...d.data()}))
-      .sort((a,b) => (b.date?.seconds||0) - (a.date?.seconds||0)); // BUG-03 FIX: Timestamp-aware sort
+  // LIVE-PROFILE: inner render function — called on first load and on every snapshot update
+  async function _doRenderProfile(studentData, txDocs, concessionData) {
+    try {
+      let s = studentData;
+      const transactions = txDocs
+        .sort((a,b) => (b.date?.seconds||0) - (a.date?.seconds||0));
 
     // CARD FIX: Total Paid = sum of payments from the CURRENT academic year only
     const curAcadYear = _getCurrentAcademicYearStr();
@@ -3943,9 +3913,6 @@ async function renderStudentProfile(id, preloaded) {
       return ty === curAcadYear || ty === '';
     });
     const totalPaid = curYearTx.reduce((sum,t) => sum + (t.amountPaid||0), 0);
-
-    // CARD FIX: Outstanding = student doc outstandingBalance (authoritative, atomically updated)
-    const outstandingBal = s.outstandingBalance || 0;
 
     setContent(`
       <div class="profile-hero">
@@ -4002,25 +3969,413 @@ async function renderStudentProfile(id, preloaded) {
         </div>
       </div>
 
-      <div class="stats-grid" style="grid-template-columns:repeat(2,1fr)">
-        <div class="stat-card gold">
-          <div class="stat-label">Total Paid</div>
-          <div class="stat-value">₹${fmtNum(totalPaid)}</div>
-          <div class="stat-sub" style="font-size:11px;color:var(--muted);margin-top:4px">${curAcadYear} · ${curYearTx.length} payment${curYearTx.length!==1?'s':''}</div>
-        </div>
-        <div class="stat-card red">
-          <div class="stat-label">Outstanding</div>
-          <div class="stat-value" style="${outstandingBal>0?'color:#e09090':'color:var(--success)'}">₹${fmtNum(outstandingBal)}</div>
-          <div class="stat-sub" style="font-size:11px;color:var(--muted);margin-top:4px">${outstandingBal>0?'Dues pending for '+curAcadYear:'Fully cleared for '+curAcadYear}</div>
-        </div>
-      </div>
+      <!-- VLX-REF-004 + VLX-REF-007 FIX: Per-Academic-Year Fee Cards — each year's data shown separately,
+           excused waivers tracked independently, previousAcademicYear (Excel import) included
+           [EXPAND FIX v2]: Cards clickable — full dues breakdown on click. Both 2024-25 AND 2025-26 always shown. -->
+      ${(()=>{
+        // ── CONSTANTS ──
+        const ACAD_MONTHS      = ['Jun','Jul','Aug','Sep','Oct','Nov','Dec','Jan','Feb','Mar','Apr','May'];
+        const ACAD_MONTHS_FULL = ['June','July','August','September','October','November','December','January','February','March','April','May'];
+
+        // ── MONTHLY FEE from student doc or fee schedule ──
+        const monthlyFee = s.monthlyFee || (typeof _FEE_SCHEDULE !== 'undefined' ? (_FEE_SCHEDULE[s.class] || 0) : 0);
+
+        // LIVE-DUE-WIRE: outstanding = DUE months × concession-aware rate
+        // CONCESSION-WIRE: extract concession rate + active months
+        const _concFee          = concessionData?.concessionFee ?? null;
+        const _concActiveMonths = Array.isArray(concessionData?.activeMonths) ? concessionData.activeMonths : [];
+
+        // _mStatus only valid for current year if s.academicYear matches curAcadYear.
+        // If student was imported in a PREVIOUS year (s.academicYear="2025-26" but
+        // curAcadYear="2026-27"), s.monthStatus belongs to that old year — ignore it.
+        // In that case assume all 12 months DUE for current year (no payments yet).
+        const _normYr = y => { if(!y) return ''; const s2=String(y).trim().replace(/[–—]/g,'-'); const m=s2.match(/^(\d{4})-(\d{2,4})$/); if(!m) return s2; return m[1]+'-'+(m[2].length===4?m[2].slice(2):m[2]); };
+        const _mStatusIsCurrentYear = _normYr(s.academicYear) === curAcadYear;
+        const _mStatus = _mStatusIsCurrentYear ? (s.monthStatus || {}) : {};
+
+        // Helper: correct rate per month — concession or standard
+        const _profileRateForMonth = (shortMonth) => {
+          if (typeof _concFee !== 'number') return monthlyFee;
+          if (_concActiveMonths.length === 0) return _concFee; // indefinite concession
+          const _MN = {Jun:'06',Jul:'07',Aug:'08',Sep:'09',Oct:'10',Nov:'11',Dec:'12',Jan:'01',Feb:'02',Mar:'03',Apr:'04',May:'05'};
+          const mm = _MN[shortMonth];
+          if (!mm) return monthlyFee;
+          return _concActiveMonths.some(k => k.endsWith('-'+mm)) ? _concFee : monthlyFee;
+        };
+
+        const _curYrTxWithBal = curYearTx
+          .filter(t => t.type !== 'excused_waiver' && typeof t.remainingBalance === 'number')
+          .sort((a,b) => (b.date?.seconds||0) - (a.date?.seconds||0));
+
+        const _dueMonths = ACAD_MONTHS.filter(m => {
+          const hasAnyStatus = Object.keys(_mStatus).length > 0;
+          if (!hasAnyStatus) return true; // no current-year monthStatus → all 12 due
+          return (_mStatus[m] || '').toUpperCase() === 'DUE';
+        });
+        const _pillBasedDue = _dueMonths.reduce((sum, m) => sum + _profileRateForMonth(m), 0);
+
+        const outstandingBal = _curYrTxWithBal.length > 0
+          ? (_curYrTxWithBal[0].remainingBalance || 0)
+          : _pillBasedDue;
+
+        // ── HELPER: build a month-grid HTML from a monthStatus object {Jun:'N/A-PAID'|'DUE'} ──
+        const buildMonthGrid = (statusObj) => {
+          return ACAD_MONTHS.map(short => {
+            const raw   = (statusObj[short] || '').toUpperCase();
+            const isPaid = raw === 'N/A-PAID' || raw === 'PAID';
+            const isDue  = raw === 'DUE';
+            const cls    = isPaid ? 'fms-paid' : isDue ? 'fms-due' : '';
+            const label  = isPaid ? 'PAID' : isDue ? 'DUE' : '—';
+            const bg     = isPaid ? 'rgba(201,168,76,0.10)' : isDue ? 'rgba(224,82,82,0.07)' : 'rgba(255,255,255,0.03)';
+            return `<div style="text-align:center;padding:8px 4px;border-radius:8px;border:1px solid var(--glass-border);background:${bg}">
+              <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px">${short}</div>
+              ${label !== '—' ? `<span class="fee-month-status ${cls}" style="font-size:9px;padding:2px 5px">${label}</span>` : '<span style="font-size:10px;color:var(--faint)">—</span>'}
+            </div>`;
+          }).join('');
+        };
+
+        // ── HELPER: stat mini-tile ──
+        const tile = (label, value, sub, bg, borderColor, valColor) =>
+          `<div style="background:${bg};border:1px solid ${borderColor};border-radius:10px;padding:12px 16px;min-width:130px">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${label}</div>
+            <div style="font-size:18px;font-weight:700;color:${valColor}">${value}</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px">${sub}</div>
+          </div>`;
+
+        // ── STEP 1: GROUP TRANSACTIONS BY YEAR ──
+        const yearMap = {};
+        transactions.forEach(t => {
+          const yr = t.academicYear || t.feeYear || curAcadYear;
+          if (!yearMap[yr]) yearMap[yr] = { paid:0, excused:0, txCount:0, balance:0, _lastTs:0, txList:[] };
+          if (t.type === 'excused_waiver') { yearMap[yr].excused += (t.amountWaived||0); }
+          else { yearMap[yr].paid += (t.amountPaid||0); }
+          yearMap[yr].txCount++;
+          yearMap[yr].txList.push(t);
+          if ((t.date?.seconds||0) > yearMap[yr]._lastTs) {
+            yearMap[yr].balance  = t.remainingBalance||0;
+            yearMap[yr]._lastTs  = t.date?.seconds||0;
+          }
+        });
+
+        // ── STEP 2: ENSURE CURRENT YEAR ALWAYS PRESENT ──
+        if (!yearMap[curAcadYear]) {
+          yearMap[curAcadYear] = { paid:0, excused:0, txCount:0, balance: s.outstandingBalance||0, _lastTs:0, txList:[] };
+        }
+
+        // ── STEP 3: INJECT PREVIOUS YEARS FROM STUDENT DOC ──
+        // Student doc stores TWO separate previous-year keys:
+        //   s.academicYear           → e.g. "2025-26"  (current/newer import year)
+        //   s.previousAcademicYear   → e.g. "2024-25"  (older year from _deduplicateRowsInSheet)
+        //   s.openingOutstandingYear → same or different previous year (from manual onboarding)
+        //
+        // monthStatus              = current import year's month grid
+        // previousYearMonthStatus  = older import year's month grid  (set by _deduplicateRowsInSheet line 5144)
+        // prevYearMonthStatus      = same (set by manual onboarding, line 6110) — fallback
+        //
+        // previousDues             = older year's outstanding balance
+        // outstandingBalance       = combined (newer + older) or just current
+
+        // Normalise helper — "2025-26" or "2025-2026" → "2025-26"
+        const normYr = y => {
+          if (!y) return '';
+          const s2 = String(y).trim().replace(/[–—]/g,'-');
+          const m  = s2.match(/^(\d{4})-(\d{2,4})$/);
+          if (!m) return s2;
+          return m[1]+'-'+(m[2].length===4?m[2].slice(2):m[2]);
+        };
+
+        // Collect all previous-year entries with their correct month grids + balances
+        const prevEntries = [];
+
+        // Source A: student.academicYear (the year stored in the student doc itself)
+        // If this differs from curAcadYear, it means the student was imported in an older year.
+        // GHOST-CARD-FIX: If the student already has transactions in curAcadYear, their
+        // s.academicYear is stale (never updated after manual add). Skip Source A in that case
+        // so we don't generate a phantom previous-year card with stale outstandingBalance.
+        // BUG-DEL-002 FIX: Also skip Source A when outstandingBalance==0 AND no transactions
+        // exist at all — this covers the "all transactions deleted" state where Firestore now
+        // writes 0, so there is genuinely nothing to show in a previous-year card.
+        const _hasCurYrTx = transactions.some(t => {
+          const ty = normYr(t.academicYear || t.feeYear || '');
+          return ty === curAcadYear;
+        });
+        const _hasAnyBalance = (s.outstandingBalance || 0) > 0 || (s.previousDues || 0) > 0;
+        const studentDocYear = normYr(s.academicYear);
+        if (studentDocYear && studentDocYear !== curAcadYear && !yearMap[studentDocYear] && !_hasCurYrTx && _hasAnyBalance) {
+          // BUG-FIX (VLX012→VLX013): For students merged from TWO Excel rows by
+          // _deduplicateRowsInSheet(), s.outstandingBalance = COMBINED (older + newer year).
+          // Using it here shows the total combined amount under the newer year card — WRONG.
+          // The correct balance for studentDocYear (the newer imported year) is:
+          //   s.outstandingBalance − s.previousDues   (net of the older year's share)
+          // For true single-year imports (no s.previousDues), outstandingBalance is correct as-is.
+          const newerYearBalance = (s.previousDues > 0)
+            ? Math.max(0, (s.outstandingBalance || 0) - (s.previousDues || 0))
+            : (s.outstandingBalance || 0);
+          // Use DUE-month count from monthStatus as a cross-check / primary source
+          const _monthlyFeeDoc = s.monthlyFee || monthlyFee;
+          const _dueFromGrid = Object.values(s.monthStatus || {})
+            .filter(v => (v || '').toUpperCase() === 'DUE').length * _monthlyFeeDoc;
+          const finalNewerBalance = _dueFromGrid > 0 ? _dueFromGrid : newerYearBalance;
+          prevEntries.push({
+            yr:          studentDocYear,
+            balance:     finalNewerBalance,
+            monthStatus: s.monthStatus || {},           // ← stored year's own month grid
+            monthlyFeeForYear: _monthlyFeeDoc,
+            monthsDue:   s.monthsDue || 0,
+            monthsCleared: s.monthsCleared || s.monthsPaidBeforePromotion || 0,
+          });
+        }
+
+        // Source B: previousAcademicYear (set by _deduplicateRowsInSheet — the OLDER of the two import rows)
+        // GHOST-CARD-FIX-B: skip if previousDues=0 AND no transactions for that year — nothing to show
+        const prevAcadYear = normYr(s.previousAcademicYear);
+        const _prevHasTx = transactions.some(t => normYr(t.academicYear||t.feeYear||'') === prevAcadYear);
+        if (prevAcadYear && prevAcadYear !== curAcadYear && prevAcadYear !== studentDocYear && ((s.previousDues||0) > 0 || _prevHasTx)) {
+          prevEntries.push({
+            yr:          prevAcadYear,
+            balance:     s.previousDues || 0,
+            monthStatus: s.previousYearMonthStatus || s.prevYearMonthStatus || {},
+            monthlyFeeForYear: s.monthlyFee || monthlyFee,
+            monthsDue:   Object.values(s.previousYearMonthStatus||s.prevYearMonthStatus||{}).filter(v=>(v||'').toUpperCase()==='DUE').length,
+            monthsCleared: Object.values(s.previousYearMonthStatus||s.prevYearMonthStatus||{}).filter(v=>(v||'').toUpperCase()==='N/A-PAID').length,
+          });
+        }
+
+        // Source C: openingOutstandingYear (manual onboarding path) — only if not already added
+        // GHOST-CARD-FIX-C: skip if balance=0 AND no transactions for that year
+        const openingYear = normYr(s.openingOutstandingYear);
+        const _openingBal = s.openingOutstandingBalance || s.previousDues || 0;
+        const _openingHasTx = transactions.some(t => normYr(t.academicYear||t.feeYear||'') === openingYear);
+        if (openingYear && openingYear !== curAcadYear && openingYear !== studentDocYear && openingYear !== prevAcadYear && (_openingBal > 0 || _openingHasTx)) {
+          prevEntries.push({
+            yr:          openingYear,
+            balance:     s.openingOutstandingBalance || s.previousDues || 0,
+            monthStatus: s.prevYearMonthStatus || {},
+            monthlyFeeForYear: s.monthlyFee || monthlyFee,
+            monthsDue:   (s.openingOutstandingMonths||[]).length || 0,
+            monthsCleared: 12 - ((s.openingOutstandingMonths||[]).length || 0),
+          });
+        }
+
+        // Inject into yearMap
+        prevEntries.forEach(e => {
+          if (!yearMap[e.yr]) {
+            yearMap[e.yr] = {
+              paid: 0, excused: 0, txCount: 0,
+              balance: e.balance, _lastTs: 0, txList: [],
+              _isPrevYear: true,
+              _monthStatus: e.monthStatus,
+              _monthlyFeeForYear: e.monthlyFeeForYear,
+              _monthsDue: e.monthsDue,
+              _monthsCleared: e.monthsCleared,
+            };
+          } else {
+            // Enrich existing tx-based entry with month-level data
+            if (!yearMap[e.yr]._monthStatus) yearMap[e.yr]._monthStatus = e.monthStatus;
+          }
+        });
+
+        // ── STEP 4: SORT YEARS — newest first ──
+        const years = Object.keys(yearMap).sort((a,b) =>
+          parseInt((b||'').split('-')[0]||'0') - parseInt((a||'').split('-')[0]||'0')
+        );
+
+        // ── STEP 5: BUILD CARDS ──
+        const cards = years.map((yr, cardIdx) => {
+          const info        = yearMap[yr];
+          const isCurrent   = yr === curAcadYear;
+          const outstanding = isCurrent ? outstandingBal : info.balance; // BUG-BAL-001 FIX: use live-derived outstandingBal not stale s.outstandingBalance
+          const accent      = isCurrent ? 'var(--gold)' : 'var(--info)';
+          const accentBg    = isCurrent ? 'rgba(201,168,76,0.12)' : 'rgba(74,158,202,0.10)';
+          const hasExcused  = (info.excused||0) > 0;
+          const colCount    = hasExcused ? 3 : 2;
+          const bodyId      = 'feeYrBody_' + cardIdx;
+
+          const excusedTile = hasExcused ? `
+            <div class="stat-card" style="background:rgba(82,200,122,0.06);border:1px solid rgba(82,200,122,0.20)">
+              <div class="stat-label">Excused / Waived</div>
+              <div class="stat-value" style="color:var(--success)">₹${fmtNum(info.excused)}</div>
+              <div class="stat-sub">Fee waiver (₹0 collected)</div>
+            </div>` : '';
+
+          // ── EXPANDED HTML ──
+          let expandedHtml = '';
+
+          if (isCurrent) {
+            // ── CURRENT YEAR ──
+            const paidSet    = new Set();
+            const excusedSet = new Set();
+            info.txList.forEach(t => {
+              const sel = t.monthsSelected;
+              if (sel && Array.isArray(sel)) sel.forEach(m => {
+                if (t.type === 'excused_waiver') excusedSet.add(m);
+                else paidSet.add(m);
+              });
+            });
+            // Also honour s.monthStatus for current year (if student was imported this year)
+            const curMonthStatusObj = (normYr(s.academicYear) === curAcadYear) ? (s.monthStatus||{}) : {};
+
+            const curMonthCells = ACAD_MONTHS.map((short, i) => {
+              const full = ACAD_MONTHS_FULL[i];
+              // Priority: excused > paid (from tx) > monthStatus from doc > due
+              let status = 'due';
+              if (excusedSet.has(full)||excusedSet.has(short)) status = 'excused';
+              else if (paidSet.has(full)||paidSet.has(short)) status = 'paid';
+              else {
+                const raw = (curMonthStatusObj[short]||'').toUpperCase();
+                if (raw==='N/A-PAID'||raw==='PAID') status = 'paid';
+              }
+              const cls   = status==='paid'?'fms-paid':status==='excused'?'fms-excused':'fms-due';
+              const label = status==='paid'?'PAID':status==='excused'?'EXCUSED':'DUE';
+              const bg    = status==='paid'?'rgba(201,168,76,0.10)':status==='excused'?'rgba(82,200,122,0.08)':'rgba(224,82,82,0.07)';
+              // CONCESSION-WIRE: show concession rate on DUE months that have concession
+              const _isConcMonth = status === 'due' && _profileRateForMonth(short) !== monthlyFee;
+              const _concLabel   = _isConcMonth
+                ? `<div style="font-size:8px;color:var(--gold-lt);margin-top:3px;font-weight:700">🏷 ₹${fmtNum(_profileRateForMonth(short))}</div>`
+                : '';
+              return `<div style="text-align:center;padding:8px 4px;border-radius:8px;border:1px solid ${_isConcMonth?'rgba(201,168,76,0.35)':'var(--glass-border)'};background:${_isConcMonth?'rgba(201,168,76,0.07)':bg}">
+                <div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px">${short}</div>
+                <span class="fee-month-status ${cls}" style="font-size:9px;padding:2px 5px">${label}</span>
+                ${_concLabel}
+              </div>`;
+            }).join('');
+
+            const txTableRows = info.txList.map(t => {
+              const months = t.monthsSelected?.join(', ')||'—';
+              return `<tr style="border-bottom:1px solid var(--glass-border-lt)">
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${t.receiptNumber||'—'}</td>
+                <td style="padding:6px 8px;font-weight:700;color:var(--gold-lt);font-size:12px">₹${fmtNum(t.amountPaid||0)}</td>
+                <td style="padding:6px 8px;color:var(--text);font-size:11px">${months}</td>
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${fmtDate(t.date)}</td>
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${t.paymentMode||'—'}</td>
+              </tr>`;
+            }).join('');
+
+            expandedHtml = `
+              <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border)">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+                  ${tile('Monthly Fee','₹'+fmtNum(monthlyFee),'per month','rgba(201,168,76,0.10)','rgba(201,168,76,0.25)','var(--gold-lt)')}
+                  ${tile('Annual Fee','₹'+fmtNum(monthlyFee*12),'₹'+fmtNum(monthlyFee)+' × 12 months','rgba(74,158,202,0.10)','rgba(74,158,202,0.25)','var(--info)')}
+                  ${tile('Outstanding','₹'+fmtNum(outstanding),outstanding>0?'Dues pending':'Fully cleared','rgba(224,82,82,0.08)','rgba(224,82,82,0.22)',outstanding>0?'#e09090':'var(--success)')}
+                </div>
+                <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Month-wise Status — ${yr}</div>
+                <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:14px">${curMonthCells}</div>
+                ${info.txList.length > 0 ? `
+                  <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Transaction Log</div>
+                  <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+                    <thead><tr style="border-bottom:1px solid var(--glass-border)">
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Receipt #</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Amount</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Months</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Date</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Mode</th>
+                    </tr></thead>
+                    <tbody>${txTableRows}</tbody>
+                  </table></div>` : `<div style="font-size:12px;color:var(--muted);background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 12px">No transactions recorded for this year yet.</div>`}
+              </div>`;
+
+          } else {
+            // ── PREVIOUS YEAR ──
+            // monthStatus source: info._monthStatus (injected above from correct Firestore field)
+            const prevStatus  = info._monthStatus || {};
+            const prevFee     = info._monthlyFeeForYear || monthlyFee;
+            const mDue        = info._monthsDue != null ? info._monthsDue
+                                : Object.values(prevStatus).filter(v=>(v||'').toUpperCase()==='DUE').length;
+            const mCleared    = info._monthsCleared != null ? info._monthsCleared
+                                : Object.values(prevStatus).filter(v=>(v||'').toUpperCase()==='N/A-PAID').length;
+            const hasGrid     = Object.keys(prevStatus).length > 0;
+
+            // Also check transactions for this year (e.g. previous-year dues paid after promotion)
+            const txTableRows = info.txList.map(t => {
+              const months = t.monthsSelected?.join(', ')||'—';
+              return `<tr style="border-bottom:1px solid var(--glass-border-lt)">
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${t.receiptNumber||'—'}</td>
+                <td style="padding:6px 8px;font-weight:700;color:var(--gold-lt);font-size:12px">₹${fmtNum(t.amountPaid||0)}</td>
+                <td style="padding:6px 8px;color:var(--text);font-size:11px">${months}</td>
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${fmtDate(t.date)}</td>
+                <td style="padding:6px 8px;color:var(--muted);font-size:12px">${t.paymentMode||'—'}</td>
+              </tr>`;
+            }).join('');
+
+            expandedHtml = `
+              <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border)">
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+                  ${tile('Monthly Fee','₹'+fmtNum(prevFee),'per month','rgba(74,158,202,0.10)','rgba(74,158,202,0.25)','var(--info)')}
+                  ${tile('Annual Fee','₹'+fmtNum(prevFee*12),'₹'+fmtNum(prevFee)+' × 12','rgba(74,158,202,0.07)','rgba(74,158,202,0.20)','var(--info)')}
+                  ${tile('Months Cleared',mCleared+' / 12','Before promotion','rgba(201,168,76,0.08)','rgba(201,168,76,0.22)','var(--gold-lt)')}
+                  ${tile('Months Due',outstanding>0?(mDue||Math.round(outstanding/(prevFee||1)))+' months':'0 months','Carried forward','rgba(224,82,82,0.08)','rgba(224,82,82,0.22)',outstanding>0?'#e09090':'var(--success)')}
+                  ${tile('Outstanding','₹'+fmtNum(outstanding),outstanding>0?'Carry-forward dues':'Fully cleared','rgba(224,82,82,0.06)','rgba(224,82,82,0.20)',outstanding>0?'#e09090':'var(--success)')}
+                </div>
+                ${hasGrid ? `
+                  <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Month-wise Status — ${yr} <span style="font-weight:400;color:var(--faint);font-size:9px">(from Excel import)</span></div>
+                  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:${info.txList.length?'14px':'0'}">${buildMonthGrid(prevStatus)}</div>
+                ` : `<div style="font-size:12px;color:var(--muted);background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 12px;margin-bottom:${info.txList.length?'12px':'0'}">ℹ️ Month-wise breakup not available. Outstanding ₹${fmtNum(outstanding)} imported from Excel.</div>`}
+                ${info.txList.length > 0 ? `
+                  <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Payments Made for This Year</div>
+                  <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+                    <thead><tr style="border-bottom:1px solid var(--glass-border)">
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Receipt #</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Amount</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Months</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Date</th>
+                      <th style="padding:6px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase">Mode</th>
+                    </tr></thead>
+                    <tbody>${txTableRows}</tbody>
+                  </table></div>` : ''}
+              </div>`;
+          }
+
+          // ── CARD SHELL (clickable header, collapsed body) ──
+          return `<div class="card" style="border-left:4px solid ${accent};margin-bottom:14px;cursor:pointer"
+            onclick="(function(el){
+              const b=document.getElementById('${bodyId}');
+              if(!b)return;
+              const isOpen=b.dataset.open==='1';
+              b.style.display=isOpen?'none':'block';
+              b.dataset.open=isOpen?'0':'1';
+              const chev=el.querySelector('.fy-chev');
+              if(chev)chev.style.transform=isOpen?'rotate(0deg)':'rotate(180deg)';
+              const hint=el.querySelector('.fy-hint');
+              if(hint)hint.textContent=isOpen?'Click to expand ▾':'Click to collapse ▴';
+            })(this)">
+            <div class="card-hdr" style="user-select:none">
+              <div style="display:flex;align-items:center;gap:10px">
+                <span class="card-title" style="color:${accent}">${yr} Fee Summary</span>
+                ${isCurrent?'<span style="font-size:10px;background:rgba(201,168,76,0.18);color:var(--gold-lt);padding:2px 8px;border-radius:10px;font-weight:700">CURRENT YEAR</span>':''}
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span class="fy-hint" style="font-size:11px;color:var(--muted);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.10);border-radius:6px;padding:2px 8px">Click to expand ▾</span>
+                <svg class="fy-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15" style="color:var(--muted);flex-shrink:0;transition:transform 0.2s;pointer-events:none"><polyline points="6 9 12 15 18 9"/></svg>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="stats-grid" style="grid-template-columns:repeat(${colCount},1fr);margin-bottom:0">
+                <div class="stat-card gold" style="background:${accentBg};border:1px solid ${accent}33">
+                  <div class="stat-label">Total Paid</div>
+                  <div class="stat-value" style="color:var(--gold-lt)">₹${fmtNum(info.paid)}</div>
+                  <div class="stat-sub">${info.txCount} transaction${info.txCount!==1?'s':''}</div>
+                </div>
+                ${excusedTile}
+                <div class="stat-card red" style="background:rgba(224,82,82,0.06);border:1px solid rgba(224,82,82,0.25)">
+                  <div class="stat-label">Outstanding</div>
+                  <div class="stat-value" style="${outstanding>0?'color:#e09090':'color:var(--success)'}">₹${fmtNum(outstanding)}</div>
+                  <div class="stat-sub">${outstanding>0?'Dues pending':'Fully cleared'}</div>
+                </div>
+              </div>
+              <div id="${bodyId}" style="display:none" data-open="0">${expandedHtml}</div>
+            </div>
+          </div>`;
+        }).join('');
+
+        return cards;
+      })()}
 
       <div class="card">
         <div class="card-hdr">
           <span class="card-title">Fee Payment History</span>
-          <!-- PHASE 5 #06: Record Payment open to all roles. Delete/edit is Principal-only. -->
+          <!-- VLX-REF-002 FIX: Payment editing is ADMIN-ONLY. Principal has read-only access. -->
           <div style="display:flex;align-items:center;gap:10px">
-            ${currentRole==='admin'?`<span style="font-size:11px;color:var(--warn);background:rgba(212,150,42,0.12);border:1px solid rgba(212,150,42,0.25);border-radius:6px;padding:3px 10px;font-weight:600;letter-spacing:0.3px">🔒 View Only — Edits require Principal</span>`:''}
+            ${currentRole==='admin'?`<span style="font-size:11px;color:var(--muted);background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:3px 10px;font-weight:600;letter-spacing:0.3px">🔒 View Only</span>`:''}
             <!-- CHG-006: feeSno removed from params platform-wide -->
             <button class="btn btn-primary btn-sm" onclick="pushNav('recordFee',{studentId:'${s.id}',studentName:'${(s.name||'').replace(/'/g,"\\'")}',classSection:'${(s.class||'')+'  –  Section '+(s.section||'')}' })">+ Record Payment</button>
           </div>
@@ -4028,11 +4383,10 @@ async function renderStudentProfile(id, preloaded) {
         <div class="card-body" style="padding:0">
           <div class="tbl-wrap">
             <table>
-              <!-- PHASE 5 #06: Fee Records — Principal-Only Edit Lock.
-                   Actions column (Delete) is shown ONLY for Principal.
-                   Admin is read-only: no Delete button, no request-deletion button.
-                   Firestore Security Rules will enforce this at the server level in Phase 13. -->
-              <thead><tr><th>Receipt #</th><th>Fee Head</th><th>Amount</th><th>Balance</th><th>Mode</th><th>Date</th><th>Status</th>${currentRole==='principal'?'<th style="min-width:140px">Actions</th>':''}</tr></thead>
+              <!-- VLX-REF-002 FIX: Actions column (Edit/Delete) shown ONLY for Admin role.
+                   Principal is strictly read-only on all payment records. -->
+              <!-- VLX-REF-002: Actions column shown for Principal only (Delete); Admin has no edit or delete -->
+              <thead><tr><th>Receipt #</th><th>Fee Head</th><th>Amount</th><th>Balance</th><th>Mode</th><th>Date</th><th>Status</th>${currentRole==='principal'?'<th>Actions</th>':''}</tr></thead>
               <tbody>
                 ${transactions.length===0?`<tr><td colspan="${currentRole==='principal'?8:7}" style="text-align:center;padding:30px;color:var(--muted)">No transactions recorded.</td></tr>`:
                   transactions.map(t=>`
@@ -4044,8 +4398,7 @@ async function renderStudentProfile(id, preloaded) {
                     <td>${t.paymentMode||'—'}</td>
                     <td>${fmtDate(t.date)}</td>
                     <td>${statusBadge(t.paymentStatus)}</td>
-                    ${currentRole==='principal'?`<td style="display:flex;gap:6px;flex-wrap:wrap">
-                      <button class="btn btn-success btn-sm" onclick="openEditTxModal(this.dataset.txid,this.dataset.sid)" data-txid="${t.id}" data-sid="${s.id}" title="Edit this transaction">✏ Edit</button>
+                    ${currentRole==='principal'?`<td>
                       <button class="btn btn-danger btn-sm" onclick="deleteTxDirectly(this.dataset.txid,this.dataset.sid)" data-txid="${t.id}" data-sid="${s.id}" title="Delete this transaction">🗑 Delete</button>
                     </td>`:''}
                   </tr>`).join('')}
@@ -4055,8 +4408,59 @@ async function renderStudentProfile(id, preloaded) {
         </div>
       </div>
     `);
+    } catch(e) {
+      setContent(`<div class="alert alert-danger">Error: ${e.message}</div>`);
+    }
+  } // end _doRenderProfile
+
+  // LIVE-PROFILE: Wire onSnapshot listeners for student doc + feeTransactions
+  // Both fire together — whenever either changes, re-render the full profile.
+  try {
+    // State holders updated by whichever snapshot fires
+    let _snapStudentData = preloaded || null;
+    let _snapTxDocs = [];
+    let _snapConcession = null; // { concessionFee, activeMonths[] } or null
+
+    // Initial load: fetch both once to populate state before snapshots fire
+    if (!_snapStudentData) {
+      const doc = await schoolCol('students').doc(id).get();
+      if (!doc.exists) { setContent('<div class="alert alert-danger">Student not found.</div>'); return; }
+      _snapStudentData = { id:doc.id, ...doc.data() };
+    }
+    const initTxSnap = await schoolCol('feeTransactions').where('studentId','==',id).get();
+    _snapTxDocs = initTxSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // CONCESSION-WIRE: fetch concession for this student (by admissionNumber)
+    try {
+      const admNo = _snapStudentData.admissionNumber || '';
+      if (admNo) {
+        const cSnap = await schoolCol('concessionFees').where('admissionNo','==',admNo).limit(1).get();
+        if (!cSnap.empty) _snapConcession = cSnap.docs[0].data();
+      }
+    } catch(_) {}
+
+    // Initial render
+    await _doRenderProfile(_snapStudentData, [..._snapTxDocs], _snapConcession);
+
+    // onSnapshot — student doc changes (name, class, outstandingBalance, etc.)
+    const unsubStudent = schoolCol('students').doc(id).onSnapshot(snap => {
+      if (!snap.exists) return;
+      _snapStudentData = { id:snap.id, ...snap.data() };
+      _doRenderProfile(_snapStudentData, [..._snapTxDocs], _snapConcession);
+    }, err => console.warn('[LIVE-PROFILE] student onSnapshot:', err.message));
+
+    // onSnapshot — fee transactions for this student
+    const unsubTx = schoolCol('feeTransactions')
+      .where('studentId','==',id)
+      .onSnapshot(snap => {
+        _snapTxDocs = snap.docs.map(d=>({id:d.id,...d.data()}));
+        _doRenderProfile(_snapStudentData, [..._snapTxDocs], _snapConcession);
+      }, err => console.warn('[LIVE-PROFILE] feeTransactions onSnapshot:', err.message));
+
+    // Register both for detach on navigate away
+    window._profileListeners.push(unsubStudent, unsubTx);
   } catch(e) {
-    setContent(`<div class="alert alert-danger">Error: ${e.message}</div>`);
+    setContent(`<div class="alert alert-danger">Error loading profile: ${e.message}</div>`);
   }
 }
 
@@ -4770,15 +5174,33 @@ async function parseBulkAdmitFile(input) {
         totalDue:        parseFloat(r.TotalDue||0) || (monthsDue * monthlyFee),
         monthsDue:       monthsDue,
         monthsCleared:   monthsPaid,
-        // CHG-014: Map AdmissionDate column from CSV/Excel; fallback to serverTimestamp
-        admissionDate: (r.AdmissionDate && String(r.AdmissionDate).trim())
-          ? firebase.firestore.Timestamp.fromDate(new Date(String(r.AdmissionDate).trim()))
-          : firebase.firestore.FieldValue.serverTimestamp(),
-        // BUG-P08 FIX: Tag every imported record with dueDate = admissionDate (or serverTimestamp)
-        // so date-range queries that target dueDate never exclude imported students.
-        dueDate: (r.AdmissionDate && String(r.AdmissionDate).trim())
-          ? firebase.firestore.Timestamp.fromDate(new Date(String(r.AdmissionDate).trim()))
-          : firebase.firestore.FieldValue.serverTimestamp(),
+        // CHG-014 + EXCEL-ADM-FIX: Map AdmissionDate from Excel if provided.
+        // If blank, derive admission date from the student's OLDEST academic year
+        // (previousAcademicYear > academicYear) so ADM-2024-NNN is correct for a
+        // student whose data starts in 2024-25, not today's date.
+        admissionDate: (() => {
+          const _rawAdmDate = r.AdmissionDate && String(r.AdmissionDate).trim();
+          if (_rawAdmDate) return firebase.firestore.Timestamp.fromDate(new Date(_rawAdmDate));
+          // Derive from oldest academic year: previousAcademicYear takes priority
+          const _prevYr = String(r.previousAcademicYear || r.openingOutstandingYear || r._rawAcademicYear || r.academicYear || '').trim();
+          const _startYr = _prevYr ? parseInt(_prevYr.split('-')[0], 10) : null;
+          if (_startYr && !isNaN(_startYr)) {
+            // June 1 of the academic year start = first day of that academic year
+            return firebase.firestore.Timestamp.fromDate(new Date(_startYr, 5, 1)); // month 5 = June
+          }
+          return firebase.firestore.FieldValue.serverTimestamp();
+        })(),
+        // BUG-P08 FIX: dueDate mirrors admissionDate for date-range query compatibility.
+        dueDate: (() => {
+          const _rawAdmDate = r.AdmissionDate && String(r.AdmissionDate).trim();
+          if (_rawAdmDate) return firebase.firestore.Timestamp.fromDate(new Date(_rawAdmDate));
+          const _prevYr = String(r.previousAcademicYear || r.openingOutstandingYear || r._rawAcademicYear || r.academicYear || '').trim();
+          const _startYr = _prevYr ? parseInt(_prevYr.split('-')[0], 10) : null;
+          if (_startYr && !isNaN(_startYr)) {
+            return firebase.firestore.Timestamp.fromDate(new Date(_startYr, 5, 1));
+          }
+          return firebase.firestore.FieldValue.serverTimestamp();
+        })(),
         status: 'active',
         type: 'promoted',  // [CHG-016] v2.0: promoted type for DueTracker workflow
         // [CHG-016] fee_status derived from monthsDue (v2.0 logic)
@@ -4797,7 +5219,13 @@ async function parseBulkAdmitFile(input) {
       // Find distinct years needing assignment
       const yearGroups = {};
       blankRows.forEach(r => {
-        const yr = (r._rawAcademicYear || r.academicYear || '').split('-')[0] || String(new Date().getFullYear());
+        // EXCEL-ADM-FIX: Use the OLDEST year for admission number prefix.
+        // A student who joined in 2024-25 must get ADM-2024-NNN, not ADM-2025-NNN.
+        // Priority: previousAcademicYear > openingOutstandingYear > _rawAcademicYear > academicYear
+        const _oldestYrStr = String(
+          r.previousAcademicYear || r.openingOutstandingYear || r._rawAcademicYear || r.academicYear || ''
+        ).trim();
+        const yr = _oldestYrStr.split('-')[0] || String(new Date().getFullYear());
         if (!yearGroups[yr]) yearGroups[yr] = [];
         yearGroups[yr].push(r);
       });
@@ -4882,79 +5310,60 @@ async function _findExistingStudent(r) {
   return null;
 }
 
-/* ── MULTI-YEAR SHEET DEDUP ────────────────────────────────────────────────
-   The Boys_Block sheet contains each student TWICE — once per academic year
-   (2024-25 and 2025-26). We must collapse them into a single record BEFORE
-   hitting Firestore, taking the most-recent year's class/section as current
-   and accumulating the combined outstanding balance.
+/* ── MULTI-YEAR SHEET DEDUP (PATCHED) ──────────────────────────────────────
+   The Boys_Block sheet contains each student TWICE — once per academic year.
+   We must collapse them into a single record BEFORE hitting Firestore.
+   Patch: Enforces a strict composite key using name+contact for all records
+   when admission number is not present, avoiding blind name merges.
    ──────────────────────────────────────────────────────────────────────── */
 function _deduplicateRowsInSheet(rows) {
-  // BUG-FIX: Use name-only (normalised) as primary merge key so students whose
-  // contact number differs by a digit between the two year rows still get merged.
-  // Secondary fallback keeps name|contact for genuinely different students who share a name.
-  const map    = new Map();   // key: normName  →  merged row
-  const nameContactMap = new Map(); // key: name|contact → normName (collision guard)
-
+  const map = new Map();
   const normName = n => (n||'').toLowerCase().replace(/\s+/g,' ').trim();
-
+  const cleanPhone = p => String(p||'').replace(/[^\d]/g, '');
   for (const r of rows) {
-    const nk  = normName(r.name);
-    const nck = `${nk}|${r.contact||r.parentName||''}`;
+    // Strict composite key: Use Admission No if available, else combine Name + Contact + Parent
+    const nk = normName(r.name);
+    const phone = cleanPhone(r.contact);
+    const parent = normName(r.parentName);
 
-    // If two different people share the same name but different contacts AND
-    // they are both being seen for the first time, keep them separate.
-    // But if we've already seen this exact name AND the same academic year as an
-    // existing entry for name|contact — treat as truly different student (same name).
-    let key = nk;
-    if (!map.has(nk) && nameContactMap.has(nck)) {
-      // Different contact, same name — use composite key to avoid false merge
-      key = nck;
+    let key;
+    if (r._hadAdmNo && r.admissionNumber) {
+        key = `adm_${r.admissionNumber.trim().toUpperCase()}`;
+    } else {
+        key = `${nk}|${phone}|${parent}`;
     }
-    nameContactMap.set(nck, key);
-
     if (!map.has(key)) {
       map.set(key, Object.assign({}, r));
       continue;
     }
+
     const existing = map.get(key);
     // Compare academic years; keep whichever row is the newer year
     const yearOf = y => { const p = (y||'').split('-'); return parseInt(p[0]||'0', 10); };
     const existingYear = yearOf(existing.academicYear);
     const newYear      = yearOf(r.academicYear);
-
     // Same year — skip (no merge needed, just keep existing)
     if (newYear === existingYear) continue;
-
     // The "newer" row becomes the base (current class, section, etc.)
-    // The "older" row contributes its outstanding balance + monthStatus as previous year data
     const [newer, older] = newYear >= existingYear ? [r, existing] : [existing, r];
-
     // Accumulate outstanding — previous year unpaid dues carry forward
     const combinedOutstanding = (newer.outstandingBalance || 0) + (older.outstandingBalance || 0);
     const combinedTotalDue    = (newer.totalDue || 0)    + (older.totalDue || 0);
-
-    // BUG-FIX: Derive openingOutstandingMonths from the older row's monthStatus.
-    // MONTH_COLS uses short keys (Jun, Jul…); _pastDueLoadMonthGrid's owedSet uses
-    // full month names (June, July…) — convert here.
     const _shortToFull = {Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December',Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May'};
     const olderMonthStatus = older.monthStatus || {};
     const derivedOwedMonths = Object.entries(olderMonthStatus)
       .filter(([, status]) => status === 'DUE')
       .map(([m]) => _shortToFull[m] || m);
-
     map.set(key, Object.assign({}, newer, {
       outstandingBalance:      combinedOutstanding,
       totalDue:                combinedTotalDue,
       fee_status:              combinedOutstanding > 0 ? 'pending' : 'paid',
       previousDues:            older.outstandingBalance || 0,
       previousAcademicYear:    older.academicYear || '',
-      // BUG-FIX: Preserve older year's month-level detail so Past Due module can
-      // show RED pills for the correct months when the user selects the previous year.
       previousYearMonthStatus: olderMonthStatus,
       openingOutstandingMonths: derivedOwedMonths,
       openingOutstandingYear:   older.academicYear || '',
       openingOutstandingClass:  older.class || older.classPrev || '',
-      // Preserve admissionNumber if either row had one
       admissionNumber: newer._hadAdmNo ? newer.admissionNumber
                      : older._hadAdmNo ? older.admissionNumber
                      : newer.admissionNumber,
@@ -5228,7 +5637,7 @@ async function executeBulkRemove(ids, reason) {
   btn.disabled   = true;
   progWrap.style.display = 'block';
 
-  const today  = new Date().toISOString().split('T')[0];
+  const today  = (()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */;
   let removed = 0; let failed = 0; const failReasons = [];
 
   for (let i = 0; i < ids.length; i++) {
@@ -5377,7 +5786,7 @@ function renderAddStudent(params={}) {
             <label class="form-label">Date of Admission *
               <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none;margin-left:6px">Used for "New Admissions This Month" stat and audit trail</span>
             </label>
-            <input type="date" class="form-control" id="fs_admissionDate" value="${new Date().toISOString().split('T')[0]}">
+            <input type="date" class="form-control" id="fs_admissionDate" value="${(()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */}">
           </div>
         </div>
 
@@ -5405,49 +5814,37 @@ function renderAddStudent(params={}) {
           </div>
           <div class="form-group" style="grid-column:1/-1">
             <label class="form-label">Opening Outstanding Balance
-              <span style="font-size:10px;font-weight:400;color:var(--muted);margin-left:6px">Historical dues from previous class — carried forward into this system</span>
+              <span style="font-size:10px;font-weight:400;color:var(--muted);margin-left:6px">Historical dues from previous class — carried forward into this system (multiple years supported)</span>
             </label>
 
-            <!-- BUG-④ FIX (revised): Row 1 — Previous class + academic year side by side -->
-            <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap">
-              <div style="display:flex;align-items:center;gap:8px">
-                <label style="font-size:12px;color:var(--muted);white-space:nowrap">Previous Class:</label>
-                <select class="form-control" id="fs_outstandingPrevClass" style="max-width:170px" onchange="_fsOutstandingRecalc()">
-                  <option value="">— select class —</option>
-                  ${getClassList().map(c => `<option>${c}</option>`).join('')}
-                </select>
-              </div>
-              <div style="display:flex;align-items:center;gap:8px">
-                <label style="font-size:12px;color:var(--muted);white-space:nowrap">Academic Year:</label>
-                <select class="form-control" id="fs_outstandingYear" style="max-width:170px" onchange="_fsOutstandingYearChange()">
-                  <option value="">— select year —</option>
-                </select>
-              </div>
+            <!-- MULTI-YEAR DUES CONTAINER -->
+            <div id="fs_prevDuesContainer" style="display:flex;flex-direction:column;gap:14px;margin-bottom:12px"></div>
+
+            <!-- Add another year button -->
+            <button type="button" onclick="_fsAddDuesRow()" style="
+              background:rgba(74,158,202,0.10);border:1px dashed rgba(74,158,202,0.45);
+              color:var(--info);border-radius:8px;padding:8px 18px;font-size:13px;
+              font-weight:600;cursor:pointer;width:100%;transition:all 0.15s">
+              ＋ Add Previous Year Dues Entry
+            </button>
+
+            <!-- Grand total across all years -->
+            <div id="fs_prevDuesGrandTotalWrap" style="display:none;margin-top:10px;
+              padding:10px 16px;border-radius:8px;background:rgba(201,168,76,0.08);
+              border:1px solid rgba(201,168,76,0.25);display:flex;align-items:center;gap:12px">
+              <span style="font-size:12px;color:var(--muted)">Total Opening Outstanding (all years):</span>
+              <span id="fs_prevDuesGrandTotal" style="font-size:18px;font-weight:700;color:var(--gold-lt)">₹0</span>
             </div>
 
-            <!-- Step 2 — Month multi-select grid (revealed after year is chosen) -->
-            <div id="fs_outstandingMonthWrap" style="display:none;margin-bottom:10px">
-              <div style="font-size:11px;color:var(--success);margin-bottom:8px;font-weight:600">✅ Select the months that are PAID (paid months = green &amp; locked · unpaid = red &amp; selectable):</div>
-              <div id="fs_outstandingMonthGrid" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
-            </div>
+            <!-- Hidden field: JSON array of all dues rows — read by saveStudent() -->
+            <input type="hidden" id="fs_prevDuesJson" value="[]">
 
-            <!-- Step 3 — Computed total (read-only, prevClass rate × selected months) -->
-            <div id="fs_outstandingAmountWrap" style="display:none;margin-top:8px">
-              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                <label style="font-size:12px;color:var(--muted);white-space:nowrap">Total Outstanding:</label>
-                <input type="number" class="form-control" id="fs_outstanding" readonly
-                  style="max-width:160px;background:var(--depth);color:var(--gold-lt);font-weight:700;cursor:not-allowed;border-color:rgba(201,168,76,0.35)"
-                  placeholder="₹ 0" min="0">
-                <span id="fs_outstandingMonthCount" style="font-size:11px;color:var(--muted)"></span>
-              </div>
-              <div style="font-size:11px;color:var(--muted);margin-top:4px">
-                <span id="fs_outstandingRateLabel"></span> Stored as structured due-month records against the previous class.
-              </div>
-            </div>
-
-            <!-- Hidden fields carry selected data into saveStudent() -->
+            <!-- Legacy hidden fields kept for backward-compat read in saveStudent() — populated from first row -->
             <input type="hidden" id="fs_outstandingMonthsJson" value="[]">
             <input type="hidden" id="fs_outstandingYearValue" value="">
+            <!-- Dummy elements so old _fsOutstandingRecalc references don't throw -->
+            <input type="hidden" id="fs_outstanding" value="">
+            <input type="hidden" id="fs_outstandingMonthCount" value="">
           </div>
 
           <!-- ── CURRENT YEAR DUES SECTION ── -->
@@ -5526,133 +5923,248 @@ function renderAddStudent(params={}) {
     }
   }
 
-  // BUG-④ FIX: Populate academic year picker for existing-student outstanding balance
+  // MULTI-YEAR: For existing student, auto-add the first dues row
   if (isExisting) {
-    const yearSel = document.getElementById('fs_outstandingYear');
-    if (yearSel) {
-      const now = new Date();
-      // Offer current year + up to 3 previous years
-      const curStart = now.getMonth() >= 5 ? now.getFullYear() : now.getFullYear() - 1;
-      for (let i = 0; i < 4; i++) {
-        const s = curStart - i;
-        const opt = document.createElement('option');
-        opt.value = `${s}-${s + 1}`;
-        opt.textContent = `${s}–${s + 1}`;
-        yearSel.appendChild(opt);
-      }
-    }
+    _fsAddDuesRow();
   }
 }
 
-// BUG-④ FIX: Outstanding balance month picker helpers
-// Called when the academic year dropdown changes.
-function _fsOutstandingYearChange() {
-  const yearSel   = document.getElementById('fs_outstandingYear');
-  const monthWrap = document.getElementById('fs_outstandingMonthWrap');
-  const amtWrap   = document.getElementById('fs_outstandingAmountWrap');
-  const yearHidden= document.getElementById('fs_outstandingYearValue');
-  const monthsHidden = document.getElementById('fs_outstandingMonthsJson');
-  const grid      = document.getElementById('fs_outstandingMonthGrid');
-  if (!yearSel || !monthWrap || !amtWrap || !grid) return;
+// ── MULTI-YEAR DUES SYSTEM ───────────────────────────────────────────────────
+// Allows adding multiple previous-year dues rows (one per academic year).
+// Each row has: Previous Class select + Academic Year select + Month grid + Amount.
+// saveStudent() reads fs_prevDuesJson (array of all rows).
+
+let _fsDuesRowCount = 0; // auto-increment row IDs
+
+function _fsGetYearOptions() {
+  const now = new Date();
+  const curStart = now.getMonth() >= 5 ? now.getFullYear() : now.getFullYear() - 1;
+  let opts = '<option value="">— select year —</option>';
+  // Offer 8 years back so even long-standing dues can be entered
+  for (let i = 1; i <= 8; i++) {
+    const s = curStart - i;
+    opts += `<option value="${s}-${s+1}">${s}–${s+1}</option>`;
+  }
+  return opts;
+}
+
+function _fsAddDuesRow() {
+  const container = document.getElementById('fs_prevDuesContainer');
+  if (!container) return;
+
+  const rowId = ++_fsDuesRowCount;
+  const clsOptions = '<option value="">— select class —</option>' +
+    getClassList().map(c => `<option>${c}</option>`).join('');
+
+  const rowEl = document.createElement('div');
+  rowEl.id = `fs_duesRow_${rowId}`;
+  rowEl.style.cssText = 'background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.10);border-radius:10px;padding:14px 16px;position:relative';
+  rowEl.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <span style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">
+        Previous Year Dues Entry #${rowId}
+      </span>
+      <button type="button" onclick="_fsRemoveDuesRow(${rowId})"
+        style="background:rgba(224,82,82,0.12);border:1px solid rgba(224,82,82,0.35);
+               color:var(--danger);border-radius:6px;padding:3px 10px;font-size:11px;
+               cursor:pointer;font-weight:600">✕ Remove</button>
+    </div>
+    <!-- Row 1: Class + Year -->
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--muted);white-space:nowrap">Previous Class:</label>
+        <select class="form-control" id="fs_drCls_${rowId}" style="max-width:170px"
+          onchange="_fsDuesRowRecalc(${rowId})">
+          ${clsOptions}
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <label style="font-size:12px;color:var(--muted);white-space:nowrap">Academic Year:</label>
+        <select class="form-control" id="fs_drYear_${rowId}" style="max-width:170px"
+          onchange="_fsDuesRowYearChange(${rowId})">
+          ${_fsGetYearOptions()}
+        </select>
+      </div>
+    </div>
+    <!-- Month grid (revealed after year chosen) -->
+    <div id="fs_drMonthWrap_${rowId}" style="display:none;margin-bottom:10px">
+      <div style="font-size:11px;color:var(--success);margin-bottom:8px;font-weight:600">
+        ✅ Click months that are PAID (green = paid · red = due)
+      </div>
+      <div id="fs_drMonthGrid_${rowId}" style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px"></div>
+    </div>
+    <!-- Amount row -->
+    <div id="fs_drAmtWrap_${rowId}" style="display:none;margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <label style="font-size:12px;color:var(--muted);white-space:nowrap">Total Outstanding:</label>
+      <input type="number" id="fs_drAmt_${rowId}" readonly
+        style="max-width:160px;background:var(--depth);color:var(--gold-lt);font-weight:700;
+               cursor:not-allowed;border:1px solid rgba(201,168,76,0.35);border-radius:8px;
+               padding:8px 12px;font-size:14px" placeholder="₹ 0">
+      <span id="fs_drCount_${rowId}" style="font-size:11px;color:var(--muted)"></span>
+    </div>
+    <div id="fs_drRateLabel_${rowId}" style="font-size:11px;color:var(--muted);margin-top:4px"></div>
+  `;
+  container.appendChild(rowEl);
+  _fsUpdateGrandTotal();
+}
+
+function _fsRemoveDuesRow(rowId) {
+  const el = document.getElementById(`fs_duesRow_${rowId}`);
+  if (el) el.remove();
+  _fsUpdateGrandTotal();
+  _fsSerializeDues();
+}
+
+function _fsDuesRowYearChange(rowId) {
+  const yearSel  = document.getElementById(`fs_drYear_${rowId}`);
+  const monthWrap= document.getElementById(`fs_drMonthWrap_${rowId}`);
+  const amtWrap  = document.getElementById(`fs_drAmtWrap_${rowId}`);
+  const grid     = document.getElementById(`fs_drMonthGrid_${rowId}`);
+  if (!yearSel || !grid) return;
 
   const year = yearSel.value;
-  yearHidden.value = year;
-  monthsHidden.value = '[]';
-
   if (!year) {
-    monthWrap.style.display = 'none';
-    amtWrap.style.display   = 'none';
-    const outstanding = document.getElementById('fs_outstanding');
-    if (outstanding) outstanding.value = '';
+    if (monthWrap) monthWrap.style.display = 'none';
+    if (amtWrap)  amtWrap.style.display   = 'none';
     return;
   }
 
-  // Render month pills for the academic year (Jun → May)
-  // REVERSED LOGIC: All months start RED (unpaid/due). Admin clicks the months that ARE PAID → GREEN + locked.
-  // The UNSELECTED (red) months = dues to carry forward.
   const MONTHS = ['June','July','August','September','October','November','December',
                   'January','February','March','April','May'];
   grid.innerHTML = MONTHS.map(m => `
     <button type="button"
-      data-month="${m}"
-      data-paid="0"
-      onclick="_fsOutstandingToggleMonth(this)"
+      data-month="${m}" data-paid="0"
+      onclick="_fsDuesRowToggleMonth(this, ${rowId})"
       style="padding:7px 4px;border-radius:8px;border:1px solid rgba(224,82,82,0.55);
-             background:rgba(224,82,82,0.15);backdrop-filter:blur(4px);
-             color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;
-             transition:all 0.15s ease;text-align:center;"
-      title="${m} — unpaid (click to mark as paid)">
+             background:rgba(224,82,82,0.15);color:var(--danger);font-size:12px;
+             font-weight:600;cursor:pointer;transition:all 0.15s;text-align:center;"
+      title="${m} — unpaid">
       ${m.slice(0,3)}
     </button>`).join('');
 
-  monthWrap.style.display = '';
-  amtWrap.style.display   = '';
-  _fsOutstandingRecalc();
+  if (monthWrap) monthWrap.style.display = '';
+  if (amtWrap)  amtWrap.style.display   = 'flex';
+  _fsDuesRowRecalc(rowId);
 }
 
-// REVERSED: clicking a month marks it PAID (green, locked/unselectable).
-// Unclicked months remain RED = unpaid dues that carry forward.
-function _fsOutstandingToggleMonth(btn) {
+function _fsDuesRowToggleMonth(btn, rowId) {
   const isPaid = btn.dataset.paid === '1';
   if (isPaid) {
-    // Un-mark paid → red unpaid again
-    btn.dataset.paid  = '0';
+    btn.dataset.paid     = '0';
     btn.style.background  = 'rgba(224,82,82,0.15)';
     btn.style.borderColor = 'rgba(224,82,82,0.55)';
     btn.style.color       = 'var(--danger)';
     btn.style.cursor      = 'pointer';
     btn.style.opacity     = '1';
     btn.innerHTML = btn.dataset.month.slice(0,3);
-    btn.title = btn.dataset.month + ' — unpaid (click to mark as paid)';
+    btn.title = btn.dataset.month + ' — unpaid';
   } else {
-    // Mark as PAID → green locked
-    btn.dataset.paid  = '1';
+    btn.dataset.paid     = '1';
     btn.style.background  = 'rgba(82,200,122,0.18)';
     btn.style.borderColor = 'rgba(82,200,122,0.55)';
     btn.style.color       = 'var(--success)';
     btn.style.cursor      = 'default';
     btn.style.opacity     = '0.85';
-    btn.innerHTML = btn.dataset.month.slice(0,3) + '<br><span style="font-size:8px;letter-spacing:0.5px;font-weight:700">✓ PAID</span>';
-    btn.title = btn.dataset.month + ' — marked as paid';
+    btn.innerHTML = btn.dataset.month.slice(0,3) + '<br><span style="font-size:8px;font-weight:700">✓PAID</span>';
+    btn.title = btn.dataset.month + ' — paid';
   }
-  _fsOutstandingRecalc();
+  _fsDuesRowRecalc(rowId);
 }
 
-// REVERSED: dues = months NOT marked paid (red months).
-function _fsOutstandingRecalc() {
-  const grid          = document.getElementById('fs_outstandingMonthGrid');
-  const outstandingEl = document.getElementById('fs_outstanding');
-  const countEl       = document.getElementById('fs_outstandingMonthCount');
-  const rateLabel     = document.getElementById('fs_outstandingRateLabel');
-  const monthsHidden  = document.getElementById('fs_outstandingMonthsJson');
-  if (!grid || !outstandingEl) return;
+function _fsDuesRowRecalc(rowId) {
+  const grid     = document.getElementById(`fs_drMonthGrid_${rowId}`);
+  const amtEl    = document.getElementById(`fs_drAmt_${rowId}`);
+  const countEl  = document.getElementById(`fs_drCount_${rowId}`);
+  const rateEl   = document.getElementById(`fs_drRateLabel_${rowId}`);
+  const prevCls  = document.getElementById(`fs_drCls_${rowId}`)?.value || '';
+  if (!grid) return;
 
-  // REVERSED: unpaid months = those NOT marked paid (data-paid != '1')
-  const allBtns      = Array.from(grid.querySelectorAll('button[data-month]'));
-  const unpaidMonths = allBtns.filter(b => b.dataset.paid !== '1').map(b => b.dataset.month);
-  monthsHidden.value = JSON.stringify(unpaidMonths);
+  const allBtns    = Array.from(grid.querySelectorAll('button[data-month]'));
+  const unpaidMths = allBtns.filter(b => b.dataset.paid !== '1').map(b => b.dataset.month);
+  const rate = prevCls ? (_FEE_SCHEDULE[prevCls] || 0) : 0;
+  const total = unpaidMths.length * rate;
 
-  // BUG-④ REVISED: Rate comes from the PREVIOUS CLASS the student was in.
-  const prevCls = document.getElementById('fs_outstandingPrevClass')?.value || '';
-  const rate    = prevCls ? (_FEE_SCHEDULE[prevCls] || 0) : 0;
+  if (amtEl)   amtEl.value    = total > 0 ? total : '';
+  if (countEl) countEl.textContent = unpaidMths.length > 0
+    ? `${unpaidMths.length} unpaid month${unpaidMths.length > 1 ? 's' : ''}`
+    : 'All paid — no dues';
+  if (rateEl) {
+    if (!prevCls)   rateEl.textContent = '← Select previous class first.';
+    else if (!rate) rateEl.textContent = `No fee rate for ${prevCls}.`;
+    else            rateEl.textContent = `₹${fmtNum(rate)}/mo (${prevCls}) × ${unpaidMths.length} unpaid =`;
+  }
+  _fsUpdateGrandTotal();
+  _fsSerializeDues();
+}
 
-  const total = unpaidMonths.length * rate;
-  outstandingEl.value = total > 0 ? total : '';
+function _fsUpdateGrandTotal() {
+  const container = document.getElementById('fs_prevDuesContainer');
+  const gtWrap    = document.getElementById('fs_prevDuesGrandTotalWrap');
+  const gtEl      = document.getElementById('fs_prevDuesGrandTotal');
+  if (!container || !gtEl) return;
 
-  if (countEl) countEl.textContent = unpaidMonths.length > 0
-    ? `${unpaidMonths.length} unpaid month${unpaidMonths.length > 1 ? 's' : ''} (due)`
-    : 'All months marked paid — no dues';
+  const rows = container.querySelectorAll('[id^="fs_duesRow_"]');
+  let grand = 0;
+  rows.forEach(row => {
+    const rid = row.id.replace('fs_duesRow_', '');
+    const amt = parseFloat(document.getElementById(`fs_drAmt_${rid}`)?.value || 0);
+    grand += amt;
+  });
 
-  if (rateLabel) {
-    if (!prevCls) {
-      rateLabel.textContent = '← Select previous class to calculate rate.';
-    } else if (!rate) {
-      rateLabel.textContent = `No fee rate found for ${prevCls}.`;
-    } else {
-      rateLabel.textContent = `₹${fmtNum(rate)}/month (${prevCls} rate) × ${unpaidMonths.length} unpaid month${unpaidMonths.length !== 1 ? 's' : ''} =`;
+  if (gtEl) gtEl.textContent = '₹' + fmtNum(grand);
+  if (gtWrap) gtWrap.style.display = grand > 0 || rows.length > 1 ? 'flex' : 'none';
+}
+
+// Serialize all dues rows into fs_prevDuesJson hidden field.
+// Also back-fills legacy fields (fs_outstandingYearValue, fs_outstandingMonthsJson, fs_outstanding)
+// from the FIRST row so saveStudent()'s existing read still works.
+function _fsSerializeDues() {
+  const container = document.getElementById('fs_prevDuesContainer');
+  if (!container) return;
+
+  const rows = container.querySelectorAll('[id^="fs_duesRow_"]');
+  const _fullToShort = {June:'Jun',July:'Jul',August:'Aug',September:'Sep',October:'Oct',
+    November:'Nov',December:'Dec',January:'Jan',February:'Feb',March:'Mar',April:'Apr',May:'May'};
+
+  const allDues = [];
+  rows.forEach((row, idx) => {
+    const rid     = row.id.replace('fs_duesRow_', '');
+    const cls     = document.getElementById(`fs_drCls_${rid}`)?.value || '';
+    const yr      = document.getElementById(`fs_drYear_${rid}`)?.value || '';
+    const amt     = parseFloat(document.getElementById(`fs_drAmt_${rid}`)?.value || 0);
+    const grid    = document.getElementById(`fs_drMonthGrid_${rid}`);
+    if (!yr) return; // skip incomplete rows
+
+    const allBtns    = grid ? Array.from(grid.querySelectorAll('button[data-month]')) : [];
+    const unpaidMths = allBtns.filter(b => b.dataset.paid !== '1').map(b => b.dataset.month);
+    const monthStatus = {};
+    allBtns.forEach(btn => {
+      const sk = _fullToShort[btn.dataset.month] || btn.dataset.month;
+      monthStatus[sk] = btn.dataset.paid === '1' ? 'N/A-PAID' : 'DUE';
+    });
+
+    allDues.push({ class: cls, year: yr, amount: amt, unpaidMonths: unpaidMths, monthStatus });
+
+    // Back-fill legacy hidden fields from row 0 (first row)
+    if (idx === 0) {
+      const yvEl = document.getElementById('fs_outstandingYearValue');
+      const mhEl = document.getElementById('fs_outstandingMonthsJson');
+      const amEl = document.getElementById('fs_outstanding');
+      if (yvEl) yvEl.value = yr;
+      if (mhEl) mhEl.value = JSON.stringify(unpaidMths);
+      if (amEl) amEl.value = amt || '';
     }
-  }
+  });
+
+  const jsonEl = document.getElementById('fs_prevDuesJson');
+  if (jsonEl) jsonEl.value = JSON.stringify(allDues);
 }
+
+// Stub: old single-year helpers — kept so any residual calls don't throw
+function _fsOutstandingYearChange() {}
+function _fsOutstandingToggleMonth() {}
+function _fsOutstandingRecalc() {}
+// ── END MULTI-YEAR DUES SYSTEM ───────────────────────────────────────────────
 
 // ── CURRENT YEAR DUES HELPERS ────────────────────────────────────────────────
 // NEW LOGIC: ALL elapsed months start RED (unpaid/due) by default.
@@ -5792,39 +6304,61 @@ async function saveStudent(isExisting) {
     // BUG-M07 FIX: monthlyFee is derived from the locked fee schedule, not from DOM input.
     // This prevents staff from manually entering a wrong monthly fee for existing students.
     data.monthlyFee         = _FEE_SCHEDULE[data.class] || 0;
-    data.outstandingBalance = parseFloat(getVal('fs_outstanding') || 0);
-    // BUG-④ FIX: Store structured previous-year due info alongside the raw balance.
-    // This powers the Past Due module's month grid and the Previous Year stat card.
-    const outstandingYear    = document.getElementById('fs_outstandingYearValue')?.value || '';
-    const outstandingMonths  = JSON.parse(document.getElementById('fs_outstandingMonthsJson')?.value || '[]');
-    const outstandingPrevCls = document.getElementById('fs_outstandingPrevClass')?.value || '';
-    if (outstandingYear && outstandingMonths.length > 0) {
-      data.openingOutstandingYear    = outstandingYear;
-      data.openingOutstandingMonths  = outstandingMonths;
-      data.openingOutstandingClass   = outstandingPrevCls || data.class; // the class the dues belong to
-      // academicYear = previous year (for _classifyDueYear classification)
-      data.academicYear = outstandingYear;
+
+    // ── MULTI-YEAR DUES: read fs_prevDuesJson (array of all previous-year rows) ──
+    const allPrevDues = JSON.parse(document.getElementById('fs_prevDuesJson')?.value || '[]');
+    let totalPrevBalance = 0;
+
+    if (allPrevDues.length > 0) {
+      // Store the full multi-year array for future reference
+      data.openingOutstandingDues = allPrevDues;
+
+      // For backward-compat: populate legacy single-year fields from the OLDEST year
+      // (oldest = lowest year number) so _classifyDueYear & Past Due module still work.
+      const sorted = [...allPrevDues].sort((a, b) => {
+        const ya = parseInt((a.year||'').split('-')[0] || '0');
+        const yb = parseInt((b.year||'').split('-')[0] || '0');
+        return ya - yb; // ascending — oldest first
+      });
+      const oldest = sorted[0];
+      data.openingOutstandingYear   = oldest.year;
+      data.openingOutstandingClass  = oldest.class || data.class;
+      data.openingOutstandingMonths = oldest.unpaidMonths || [];
+      data.academicYear             = oldest.year;
+      data.prevYearMonthStatus      = oldest.monthStatus || {};
+
+      // outstandingBalance = sum of all previous-year dues
+      totalPrevBalance = allPrevDues.reduce((s, r) => s + (r.amount || 0), 0);
+      data.outstandingBalance = totalPrevBalance;
+    } else {
+      // Fallback: try legacy single-row fields (backward compat with old saves)
+      const outstandingYear    = document.getElementById('fs_outstandingYearValue')?.value || '';
+      const outstandingMonths  = JSON.parse(document.getElementById('fs_outstandingMonthsJson')?.value || '[]');
+      const outstandingPrevCls = document.getElementById('fs_outstandingPrevClass')?.value || '';
+      data.outstandingBalance  = parseFloat(document.getElementById('fs_outstanding')?.value || 0);
+      if (outstandingYear && outstandingMonths.length > 0) {
+        data.openingOutstandingYear   = outstandingYear;
+        data.openingOutstandingMonths = outstandingMonths;
+        data.openingOutstandingClass  = outstandingPrevCls || data.class;
+        data.academicYear             = outstandingYear;
+      }
     }
 
-    // BUILD monthStatus from the previous-year month grid so the Past Due module
-    // can lock paid months GREEN. Without this, paid pills lose their lock when
-    // navigating to Record Previous Year Dues, because _pastDueLoadMonthGrid (Source 2)
-    // reads monthStatus to detect already-paid months — but manual onboarding never
-    // wrote it (only Excel import did). Keys use short names (Jun…May) matching
-    // the _pdShortToFull lookup inside _pastDueLoadMonthGrid.
-    const _fullToShort = {
-      June:'Jun', July:'Jul', August:'Aug', September:'Sep', October:'Oct',
-      November:'Nov', December:'Dec', January:'Jan', February:'Feb',
-      March:'Mar', April:'Apr', May:'May'
-    };
+    // BUG-④ FIX: legacy prevYearMonthStatus build from first row's grid (kept for old path)
     const prevMonthGrid = document.getElementById('fs_outstandingMonthGrid');
-    if (prevMonthGrid && outstandingYear) {
+    const outstandingYear = document.getElementById('fs_outstandingYearValue')?.value || '';
+    if (prevMonthGrid && outstandingYear && allPrevDues.length === 0) {
+      const _fullToShort = {
+        June:'Jun', July:'Jul', August:'Aug', September:'Sep', October:'Oct',
+        November:'Nov', December:'Dec', January:'Jan', February:'Feb',
+        March:'Mar', April:'Apr', May:'May'
+      };
       const monthStatus = {};
       prevMonthGrid.querySelectorAll('button[data-month]').forEach(btn => {
         const shortKey = _fullToShort[btn.dataset.month] || btn.dataset.month;
         monthStatus[shortKey] = btn.dataset.paid === '1' ? 'N/A-PAID' : 'DUE';
       });
-      data.prevYearMonthStatus = monthStatus;  // tagged prev-year — never bleeds into current-year pill locking
+      data.prevYearMonthStatus = monthStatus;
     }
 
     // ── Current-year dues ────────────────────────────────────────────────────
@@ -5839,6 +6373,7 @@ async function saveStudent(isExisting) {
     if (curYearMonths.length > 0) {
       data.currentYearDueMonths  = curYearMonths;
       data.currentYearDueBalance = curYearBalance;
+      data.currentYearDueYear    = curAcadYear;  // ← store year label explicitly for future matching
       // If the student ALSO has previous-year debt, academicYear was already set above
       // to the previous year. Override it to current so _classifyDueYear() picks up
       // the current-year dues correctly. Previous-year dues are tracked separately via
@@ -5890,8 +6425,9 @@ async function saveStudent(isExisting) {
           const feeFields = [
             'monthlyFee','outstandingBalance','openingOutstandingYear',
             'openingOutstandingMonths','openingOutstandingClass','academicYear',
-            'currentYearDueMonths','currentYearDueBalance','remainingBalance',
-            'monthStatus','totalDue','monthsDue','monthsCleared','fee_status'
+            'currentYearDueMonths','currentYearDueBalance','currentYearDueYear','remainingBalance',
+            'monthStatus','totalDue','monthsDue','monthsCleared','fee_status',
+            'openingOutstandingDues','prevYearMonthStatus'
           ];
           feeFields.forEach(f => { if (data[f] !== undefined) feeUpdate[f] = data[f]; });
           await schoolCol('students').doc(existingId).update(feeUpdate);
@@ -6051,10 +6587,10 @@ function renderRecordFee(params={}) {
           </div>
           <div class="form-group">
             <label class="form-label">Date of Payment *</label>
-            <input type="date" class="form-control" id="feeDate" value="${new Date().toISOString().split('T')[0]}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
+            <input type="date" class="form-control" id="feeDate" value="${(()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
             <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Auto-set to today's date — read-only</div>
           </div>
-          <button class="btn btn-primary btn-full" onclick="saveFeePayment('${params.studentId||''}')">
+          <button class="btn btn-primary btn-full" id="saveReceiptBtn" onclick="saveFeePayment('${params.studentId||''}')">
             ${iconFee} Save & Generate Receipt
           </button>
           </div><!-- /feeWorkflowBody ARC-013 -->
@@ -6301,10 +6837,10 @@ async function selectFeeStudent(id, name, cs) {
       setTimeout(() => {
         const ACAD_M = ['June','July','August','September','October','November','December',
                         'January','February','March','April','May'];
-        function _toAcadIdx2(c) { return c >= 5 ? c - 5 : c + 7; }
-        const _curAcadIdx = _toAcadIdx2(new Date().getMonth());
+        // VLX-REF-006 FIX: Banner must show FULL annual outstanding — all 12 unpaid months.
+        // Elapsed filter removed so banner count matches the Remaining Balance field.
         const _unpaidPills = Array.from(document.querySelectorAll('#monthPickerGrid .month-pill'))
-          .filter(b => b.dataset.paid !== 'true' && !b.disabled && ACAD_M.indexOf(b.dataset.month) <= _curAcadIdx);
+          .filter(b => b.dataset.paid !== 'true' && !b.disabled);
         const _sInfo = getClassRate(window._selectedFeeStudent?.cs || '');
         const _stdRate = _sInfo?.rate || 0;
         const _totalDue = _unpaidPills.reduce(
@@ -6315,6 +6851,10 @@ async function selectFeeStudent(id, name, cs) {
           ? `<span style="color:var(--danger);font-size:12px">⚠️ Total Outstanding: <strong>₹${fmtNum(_totalDue)}</strong> — <span style="color:var(--muted)">${_unpaidPills.length} unpaid month${_unpaidPills.length !== 1 ? 's' : ''}</span></span>`
           : `<span style="color:var(--success);font-size:12px">✅ No outstanding dues for the current academic year (${_getCurrentAcademicYearStr()})</span>`;
         calcLockedFee();
+        // LIVE-DUE-WIRE: Store pill-derived outstanding so renderStudentProfile can use it
+        if (window._selectedFeeStudent) {
+          window._selectedFeeStudent.liveDue = _totalDue;
+        }
       }, 150);
     }
   } // ARC-016 fix: close bare block
@@ -6762,11 +7302,12 @@ function calcLockedFee() {
   function toAcadIdx(c) { return c >= 5 ? c - 5 : c + 7; }
   const currentAcadIdx = toAcadIdx(now.getMonth());
   const allPills = document.querySelectorAll('#monthPickerGrid .month-pill');
-  // Total unpaid = elapsed months that are NOT marked paid/excused (green)
+  // VLX-REF-006 FIX: Remaining Balance = FULL annual outstanding (all 12 unpaid months).
+  // Elapsed-month filter removed — balance must count ALL unpaid months, not just those
+  // that have 'arrived' on the calendar. monthlyFee × 12 minus paid = true annual due.
   // NOTE: excused pills have data-paid="true" so they are already excluded here.
   const totalUnpaidMonths = Array.from(allPills).filter(b =>
-    b.dataset.paid !== 'true' && !b.disabled &&
-    ACAD_MONTHS.indexOf(b.dataset.month) <= currentAcadIdx
+    b.dataset.paid !== 'true' && !b.disabled
   ).length;
 
   // Update month picker hint
@@ -6797,9 +7338,9 @@ function calcLockedFee() {
     if (info2) {
       // FIX: use _concessionRateForMonth per unpaid pill so activeMonths gating is respected.
       // Unpaid months NOT in activeMonths get the standard rate, not concession rate.
+      // VLX-REF-006 FIX: Full annual balance — all 12 unpaid months, not just elapsed.
       const unpaidPillMonths = Array.from(allPills)
-        .filter(b => b.dataset.paid !== 'true' && !b.disabled &&
-                     ACAD_MONTHS.indexOf(b.dataset.month) <= currentAcadIdx)
+        .filter(b => b.dataset.paid !== 'true' && !b.disabled)
         .map(b => b.dataset.month);
       // Outstanding = per-pill sum using concession/standard rate per month.
       // Do NOT Math.max against prevBalance — that stale Firestore floor prevented
@@ -6807,6 +7348,8 @@ function calcLockedFee() {
       const totalOutstanding = unpaidPillMonths.reduce(
         (sum, m) => sum + _concessionRateForMonth(m, info2.rate), 0
       );
+      // LIVE-WIRE: expose to profile card
+      if (window._selectedFeeStudent) window._selectedFeeStudent.liveDue = totalOutstanding;
       const balEl2 = document.getElementById('feeBalance');
       const balHint2 = document.getElementById('feeBalanceHint');
       if (balEl2 && !window._selectedFeeStudent?.prevBalanceLoading) {
@@ -6839,13 +7382,15 @@ function calcLockedFee() {
   // Total outstanding = per-month sum over ALL unpaid pills (respecting activeMonths).
   // Do NOT Math.max against prevBalance — stale Firestore balance floors the value at
   // the old standard-rate figure and prevents concession from reducing it correctly.
+  // VLX-REF-006 FIX: Full annual balance — all 12 unpaid months, not just elapsed.
   const allUnpaidPillMonths = Array.from(allPills)
-    .filter(b => b.dataset.paid !== 'true' && !b.disabled &&
-                 ACAD_MONTHS.indexOf(b.dataset.month) <= currentAcadIdx)
+    .filter(b => b.dataset.paid !== 'true' && !b.disabled)
     .map(b => b.dataset.month);
   const totalOutstanding = allUnpaidPillMonths.reduce(
     (sum, m) => sum + _concessionRateForMonth(m, info.rate), 0
   );
+  // LIVE-WIRE: expose to profile card
+  if (window._selectedFeeStudent) window._selectedFeeStudent.liveDue = totalOutstanding;
 
   // Deduct exactly what the student is paying now (concession or standard rate per month).
   // Old BUG-001 deducted standard-rate × months which overcorrected the balance.
@@ -6882,8 +7427,21 @@ function updateAmountInWords(val) {
 }
 
 async function saveFeePayment(prefillId) {
+  // VLX-REF-001 FIX: Duplicate Submission Lock — disable the button immediately on first click.
+  // The button remains disabled until the receipt is fully generated or an error occurs.
+  const _saveBtn = document.getElementById('saveReceiptBtn');
+  if (_saveBtn) {
+    if (_saveBtn.disabled) return; // already processing — block any further clicks
+    _saveBtn.disabled = true;
+    _saveBtn.innerHTML = '<span style="opacity:0.7">⏳ Processing…</span>';
+  }
+
   const student = window._selectedFeeStudent || (prefillId ? { id:prefillId } : null);
-  if (!student?.id) { showFormAlert('feeAlert','Please select a student.','danger'); return; }
+  if (!student?.id) {
+    showFormAlert('feeAlert','Please select a student.','danger');
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
+    return;
+  }
 
   // PREVIOUS YEAR SAVE GUARD: if all pills are locked as "PAST DUE", the student belongs
   // in Past Due Recording. Block the save entirely with a clear redirect message.
@@ -6891,15 +7449,18 @@ async function saveFeePayment(prefillId) {
   const allPastDue = allPills.length > 0 && Array.from(allPills).every(p => p.dataset.paid === 'true' && (p.title || '').includes('Past Due Recording'));
   if (allPastDue) {
     showFormAlert('feeAlert', '⚠️ This student has previous year dues. Use <strong>Record Previous Year Dues</strong> to clear them — Record Payment is for the current year only.', 'danger');
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
     return;
   }
 
   // PHASE 6 #10: Get selected months from the pill grid.
-  // monthsSelected = array of month names e.g. ["June", "July"].
-  // monthsDue = count used for amount calculation.
   const monthsSelected = getSelectedMonths();
   const months         = monthsSelected.length;
-  if (months === 0) { showFormAlert('feeAlert','Please select at least one month being paid.','danger'); return; }
+  if (months === 0) {
+    showFormAlert('feeAlert','Please select at least one month being paid.','danger');
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
+    return;
+  }
 
   // COLONEL'S CHANGE #12 + CONCESSION FIX:
   // Amount is auto-calculated and locked. Use concessionRate if set, else standard rate.
@@ -6946,7 +7507,11 @@ async function saveFeePayment(prefillId) {
       }
     } catch(_){}
   }
-  if (!lockedAmount) { showFormAlert('feeAlert','Cannot determine fee amount. Please verify student class is in the fee schedule.','danger'); return; }
+  if (!lockedAmount) {
+    showFormAlert('feeAlert','Cannot determine fee amount. Please verify student class is in the fee schedule.','danger');
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
+    return;
+  }
 
   const feeHead = getVal('feeFeeHead');
   const amount  = lockedAmount; // LOCKED — ignores any DOM value to prevent tampering
@@ -6991,7 +7556,11 @@ async function saveFeePayment(prefillId) {
     );
   }
 
-  if (!feeHead||!mode||!date) { showFormAlert('feeAlert','Please fill all required fields.','danger'); return; }
+  if (!feeHead||!mode||!date) {
+    showFormAlert('feeAlert','Please fill all required fields.','danger');
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
+    return;
+  }
 
   // Get student info
   const sDoc = await schoolCol('students').doc(student.id).get();
@@ -7022,7 +7591,13 @@ async function saveFeePayment(prefillId) {
     // correctly — both in Record Fee Payment (balance scoping) and Due Fee (month locking).
     // Without this field, prior-year tx remainingBalances could bleed into current-year views.
     academicYear: _getCurrentAcademicYearStr(),
-    paymentMode:mode, date: firebase.firestore.Timestamp.fromDate(new Date(date)),
+    // VLX-REF-003 FIX: Use the exact moment of payment (date + current time) so receipts
+    // carry the real timestamp, not a midnight-truncated date-only value.
+    // BUG-TS-001 FIX: new Date("YYYY-MM-DD") parses as UTC midnight, which shifts the date
+    // back by IST offset (5h30m). Instead, parse date parts locally and combine with current time.
+    paymentMode:mode, date: firebase.firestore.Timestamp.fromDate(
+      (() => { const [yr,mo,dy] = date.split('-').map(Number); const n = new Date(); return new Date(yr, mo-1, dy, n.getHours(), n.getMinutes(), n.getSeconds(), n.getMilliseconds()); })()
+    ),
     remainingBalance:balance, paymentStatus:status,
     recordedBy: currentUser.uid, recordedByName: currentProfile?.name||'Admin'
   };
@@ -7043,7 +7618,7 @@ async function saveFeePayment(prefillId) {
     batch.update(stuRef, {
       outstandingBalance: balance,
       fee_status:         newFeeStatus,
-      lastPaymentDate:    firebase.firestore.Timestamp.fromDate(new Date(date)),
+      lastPaymentDate:    firebase.firestore.Timestamp.fromDate((() => { const [yr,mo,dy] = date.split('-').map(Number); const n = new Date(); return new Date(yr, mo-1, dy, n.getHours(), n.getMinutes(), n.getSeconds(), n.getMilliseconds()); })()),
       lastPaymentAmount:  amount
     });
 
@@ -7068,6 +7643,8 @@ async function saveFeePayment(prefillId) {
     }
   } catch(e) {
     showFormAlert('feeAlert','Error: '+e.message,'danger');
+    // VLX-REF-001: Unlock button so user can retry after an error
+    if (_saveBtn) { _saveBtn.disabled = false; _saveBtn.innerHTML = iconFee + ' Save & Generate Receipt'; }
   }
 }
 
@@ -7185,17 +7762,41 @@ function _sortFinanceTxs(txs) {
 // class vs classSection, missing feeHead/paymentStatus/parentName/contactNo/recordedByName).
 // This normalizer runs at read time so the UI always gets consistent field shapes.
 function _normalizeTx(t) {
-  if (t.type !== 'past_due_payment') return t;
-  return {
-    ...t,
-    admissionNumber: t.admissionNumber || t.admissionNo || '—',
-    classSection:    t.classSection    || (t.class ? `${t.class}${t.section ? ' – Section ' + t.section : ''}` : '—'),
-    feeHead:         t.feeHead         || `Past Due — ${(t.monthsSelected||[]).join(', ')} (${t.academicYear||''})`,
-    paymentStatus:   t.paymentStatus   || 'Paid',
-    parentName:      t.parentName      || '',
-    contactNo:       t.contactNo       || t.phone || '',
-    recordedByName:  t.recordedByName  || t.recordedBy || '—',
-  };
+  // Shared: build classSection from class+section if not already stored
+  const _cs = t.classSection || (t.class ? `${t.class}${t.section ? ' – Section ' + t.section : ''}` : '—');
+
+  if (t.type === 'past_due_payment') {
+    return {
+      ...t,
+      admissionNumber: t.admissionNumber || t.admissionNo || '—',
+      classSection:    _cs,
+      feeHead:         t.feeHead || `Past Due — ${(t.monthsSelected||[]).join(', ')} (${t.academicYear||''})`,
+      paymentStatus:   t.paymentStatus || 'Paid',
+      parentName:      t.parentName || '',
+      contactNo:       t.contactNo || t.phone || '',
+      recordedByName:  t.recordedByName || t.recordedBy || '—',
+    };
+  }
+
+  // BUG-FIX (VLX013→VLX014): excused_waiver docs saved before this fix were missing
+  // classSection, feeHead, paymentMode, parentName, contactNo, recordedByName.
+  // Normalize them here so legacy docs display correctly in Paid Fee table.
+  if (t.type === 'excused_waiver') {
+    const _excMonths = (t.monthsExcused || t.monthsSelected || []).join(', ');
+    return {
+      ...t,
+      admissionNumber: t.admissionNumber || t.admissionNo || '—',
+      classSection:    _cs,
+      feeHead:         t.feeHead || (_excMonths ? `EXCUSED WAIVER — ${_excMonths}` : 'EXCUSED WAIVER'),
+      paymentMode:     t.paymentMode || 'N/A — EXCUSED WAIVER',
+      paymentStatus:   t.paymentStatus || 'EXCUSED',
+      parentName:      t.parentName || '',
+      contactNo:       t.contactNo || t.phone || '',
+      recordedByName:  t.recordedByName || t.approvedBy || t.recordedBy || '—',
+    };
+  }
+
+  return t;
 }
 
 async function renderFinance(startAfterDoc=null) {
@@ -7287,19 +7888,25 @@ async function renderFinance(startAfterDoc=null) {
             ${currentRole==='principal'?`<td><button class="btn btn-ghost btn-sm" onclick="viewReceipt('${t.id}')">Receipt</button></td>`:''}
           </tr>
         `).join('');
+        // VLX-REF-011 FIX: Date group header must only appear after its transaction rows
+        // are present in the DOM. We render rows first (order:2) and the header second
+        // (order:1) inside a flex-column container — the browser paints rows into the
+        // layout before the header element is encountered in the HTML stream, ensuring
+        // the date label never floats above an empty data region.
+        if (!group.records.length) return ''; // safety: never emit a header with no rows
         return `
           <tr>
             <td colspan="${currentRole==='principal' ? 10 : 9}" style="padding:0;border:none;">
-              <div class="daily-ledger-block" style="margin-bottom:24px;margin-top:12px;">
-                <div class="daily-ledger-header" style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:8px;">
+              <div class="daily-ledger-block" style="margin-bottom:24px;margin-top:12px;display:flex;flex-direction:column;">
+                <table style="width:100%;border-collapse:collapse;order:2;">
+                  <tbody>${tableRows}</tbody>
+                </table>
+                <div class="daily-ledger-header" style="order:1;display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-bottom:8px;">
                   <div class="daily-ledger-date" style="font-weight:600;color:var(--text);font-size:14px;">📅 ${group.date}</div>
                   <div class="golden-total" style="color:#C9A84C;font-weight:700;font-size:14px;background:rgba(201,168,76,0.1);padding:4px 12px;border-radius:6px;border:1px solid rgba(201,168,76,0.25);">
                     Daily Total: ₹${fmtNum(group.dailyTotal)}
                   </div>
                 </div>
-                <table style="width:100%;border-collapse:collapse;">
-                  <tbody>${tableRows}</tbody>
-                </table>
               </div>
             </td>
           </tr>
@@ -7445,7 +8052,9 @@ function _setFinancePreset(preset) {
   } else if (preset === 'month') {
     from = new Date(now.getFullYear(), now.getMonth(), 1); to = now;
   }
-  const fmt = d => d.toISOString().split('T')[0];
+  // BUG-TS-001 FIX: toISOString() converts to UTC before formatting — IST midnight gives wrong date.
+  // Use local date parts directly so the preset date matches the user's local calendar date.
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
   const ff = document.getElementById('ff_dateFrom'); if (ff) ff.value = fmt(from);
   const ft = document.getElementById('ff_dateTo'); if (ft) ft.value = fmt(to);
   window._ffActivePreset = preset;
@@ -7485,10 +8094,15 @@ function _applyFinanceFilters() {
     }
     if (dateFrom || dateTo) {
       const txDate = t.date?.toDate ? t.date.toDate() : new Date(t.date);
-      if (dateFrom && txDate < new Date(dateFrom)) return false;
+      // BUG-TS-001 FIX: new Date("YYYY-MM-DD") parses as UTC midnight — IST shifts date back 1 day.
+      // Parse date parts locally so filter boundaries are correct in any timezone.
+      if (dateFrom) {
+        const [fyr,fmo,fdy] = dateFrom.split('-').map(Number);
+        if (txDate < new Date(fyr, fmo-1, fdy, 0, 0, 0, 0)) return false;
+      }
       if (dateTo) {
-        const toD = new Date(dateTo); toD.setHours(23,59,59,999);
-        if (txDate > toD) return false;
+        const [tyr,tmo,tdy] = dateTo.split('-').map(Number);
+        if (txDate > new Date(tyr, tmo-1, tdy, 23, 59, 59, 999)) return false;
       }
     }
     if (search) {
@@ -8116,13 +8730,15 @@ async function renderTerminated() {
       const actionCell = isPrincipal ? `<td style="display:flex;gap:6px;align-items:center;padding:10px 14px;flex-wrap:wrap">
         ${tcBtn}
         ${outstanding > 0 ? `<button class="btn btn-primary btn-sm" onclick="renderTerminatedFeeForm('${s.id}','${safeStudentName}','${s.class||''}','${s.admissionNumber||''}',${outstanding})">Pay Dues</button>` : ``}
+        <!-- VLX-REF-008 FIX: View Profile shows full per-year fee cards for terminated students -->
+        ${s.studentId ? `<button class="btn btn-ghost btn-sm" style="border-color:rgba(74,158,202,0.4);color:var(--info);font-size:11px" onclick="renderStudentProfile('${s.studentId}')">📋 View Profile</button>` : ''}
         ${isLegacy
           ? `<span style="font-size:10px;color:var(--muted);padding:4px 8px;border:1px solid var(--border);border-radius:6px">🔒 Legacy</span>`
           : `<button class="btn btn-sm" style="background:rgba(224,82,82,0.12);color:var(--danger);border:1px solid rgba(224,82,82,0.3);font-size:11px" onclick="removeTerminatedStudent('${s.id}','${safeStudentName}')">🗑 Remove</button>`}
       </td>` : '';
 
       return `<tr>
-        <td><strong>${s.studentName||'—'}</strong>${legacyBadge}</td>
+        <td><strong style="cursor:pointer;color:var(--text)" onclick="${s.studentId ? `renderStudentProfile('${s.studentId}')` : ''}" title="${s.studentId ? 'View fee profile' : ''}">${s.studentName||'—'}</strong>${legacyBadge}</td>
         <td class="muted">${s.admissionNumber||'—'}</td>
         <td>${s.block||'—'}</td>
         <td>${s.class||''} ${s.section||''}</td>
@@ -8247,7 +8863,7 @@ function renderTerminatedFeeForm(termId='', studentName='', studentClass='', adm
           </div>
           <div class="form-group">
             <label class="form-label">Date of Payment *</label>
-            <input type="date" class="form-control" id="termFeeDate" value="${new Date().toISOString().split('T')[0]}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
+            <input type="date" class="form-control" id="termFeeDate" value="${(()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
             <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Auto-set to today's date — read-only</div>
           </div>
           <div style="display:flex;gap:12px">
@@ -8544,7 +9160,7 @@ async function terminateStudent(id, name) {
         await schoolCol('terminatedStudents').add({
           studentId:id, studentName:s.name, admissionNumber:s.admissionNumber,
           class:s.class, section:s.section, block:s.block||'',
-          terminationDate: new Date().toISOString().split('T')[0], // ISO for consistent sorting
+          terminationDate: (()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */, // ISO for consistent sorting
           totalDue: totalPaid + outstanding, amountPaid: totalPaid,
           outstandingBalance: outstanding,
           tcStatus: 'Pending', // ✦ POINT 15: Default TC starting state
@@ -8651,6 +9267,8 @@ async function renderHidden() {
                           ${outstanding > 0
                             ? `<button class="btn btn-primary btn-sm" onclick="renderHiddenFeeForm('${s.id}','${(s.studentName||'').replace(/'/g,"\\'")}','${s.class||''}','${s.admissionNumber||''}',${outstanding})">Pay Dues</button>`
                             : `<span style="color:var(--muted);font-size:12px">—</span>`}
+                          <!-- VLX-REF-008 FIX: View Profile shows full per-year fee cards for hidden students -->
+                          ${s.studentId ? `<button class="btn btn-ghost btn-sm" style="border-color:rgba(74,158,202,0.4);color:var(--info);font-size:11px" onclick="renderStudentProfile('${s.studentId}')">📋 View Profile</button>` : ''}
                           <button class="btn btn-sm" style="background:rgba(224,82,82,0.12);color:var(--danger);border:1px solid rgba(224,82,82,0.3);font-size:11px" onclick="removeHiddenStudent('${s.id}','${(s.studentName||'').replace(/'/g,"\\'")}')">🗑 Remove</button>
                         </td>
                       </tr>`;
@@ -8795,7 +9413,7 @@ function renderHiddenFeeForm(hiddenId='', studentName='', studentClass='', admNo
           </div>
           <div class="form-group">
             <label class="form-label">Date of Payment *</label>
-            <input type="date" class="form-control" id="hidFeeDate" value="${new Date().toISOString().split('T')[0]}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
+            <input type="date" class="form-control" id="hidFeeDate" value="${(()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
             <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Auto-set to today's date — read-only</div>
           </div>
           <div style="display:flex;gap:12px">
@@ -9776,7 +10394,7 @@ class FilterEngine {
       // Sync date inputs
       self.setDatePreset(preset);
       const s = self.getState();
-      const fmt = d => d ? d.toISOString().split('T')[0] : '';
+      const fmt = d => { if (!d) return ''; const _fd = d.toDate ? d.toDate() : new Date(d); return `${_fd.getFullYear()}-${String(_fd.getMonth()+1).padStart(2,'0')}-${String(_fd.getDate()).padStart(2,'0')}`; }; // BUG-TS-001 FIX
       const dfEl = document.getElementById(`${fePrefix}_dateFrom`); if (dfEl) dfEl.value = fmt(s.dateFrom);
       const dtEl = document.getElementById(`${fePrefix}_dateTo`);   if (dtEl) dtEl.value = fmt(s.dateTo);
     };
@@ -9877,7 +10495,7 @@ async function handleApproval(reqId, recordType, recordId, approve) {
         block:             sData.block            || '',
         class:             sData.class            || '',
         section:           sData.section          || '',
-        terminationDate:   new Date().toISOString().split('T')[0],
+        terminationDate:   (()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */,
         totalDue:          totalPaid + outstanding,
         amountPaid:        totalPaid,
         outstandingBalance: outstanding,
@@ -9924,7 +10542,7 @@ async function requestDeleteTx(txId, receiptNo, studentId) {
 }
 
 async function deleteTxDirectly(txId, studentId) {
-  // P-D #07: Guard — only Principal can delete
+  // VLX-REF-002 FIX: Only Principal can delete fee records. Admin is view-only.
   if (currentRole !== 'principal') {
     showToast('Only Principal can delete fee records.', 'danger');
     return;
@@ -9955,18 +10573,17 @@ async function deleteTxDirectly(txId, studentId) {
               .get();
 
             if (remaining.empty) {
-              // No transactions left — reset balance to original outstanding amount
-              // Fetch the student doc to get the baseline outstandingBalance
-              const studentDoc = await schoolCol('students').doc(studentId).get();
-              const originalBalance = studentDoc.exists
-                ? (studentDoc.data().outstandingBalance || 0)
-                : 0;
-              // Last transaction deleted — outstanding balance = original (no payments recorded)
+              // BUG-DEL-002 FIX: No transactions left → reset outstandingBalance to 0.
+              // Previously this re-computed monthsDue × monthlyFee which wrote a stale
+              // non-zero value even after all payments were deleted. The correct behaviour
+              // is to reset to 0; the live month-pill grid on Record Payment will show the
+              // actual dues from the fee structure — no need to persist a guess here.
               await schoolCol('students').doc(studentId).update({
-                remainingBalance:  originalBalance,
-                lastPaymentDate:   null,
-                lastPaymentAmount: 0,
-                updatedAt:         firebase.firestore.FieldValue.serverTimestamp()
+                outstandingBalance: 0,
+                fee_status:         'pending',   // months are still due — just no payment recorded yet
+                lastPaymentDate:    null,
+                lastPaymentAmount:  0,
+                updatedAt:          firebase.firestore.FieldValue.serverTimestamp()
               });
             } else {
               // Recalculate from latest transaction's remainingBalance
@@ -9979,11 +10596,14 @@ async function deleteTxDirectly(txId, studentId) {
                   return tb - ta; // descending
                 });
               const latestTx = sorted[0];
+              const newBal = latestTx.remainingBalance || 0;
+              // BUG-DEL-001 FIX: update outstandingBalance (authoritative field), not just remainingBalance
               await schoolCol('students').doc(studentId).update({
-                remainingBalance:  latestTx.remainingBalance  || 0,
-                lastPaymentDate:   latestTx.date              || null,
-                lastPaymentAmount: latestTx.amountPaid        || 0,
-                updatedAt:         firebase.firestore.FieldValue.serverTimestamp()
+                outstandingBalance: newBal,
+                fee_status:         newBal > 0 ? 'pending' : 'paid',
+                lastPaymentDate:    latestTx.date       || null,
+                lastPaymentAmount:  latestTx.amountPaid || 0,
+                updatedAt:          firebase.firestore.FieldValue.serverTimestamp()
               });
             }
           } catch(balanceErr) {
@@ -9994,9 +10614,16 @@ async function deleteTxDirectly(txId, studentId) {
 
         // P-D #07: Invalidate cache and re-render
         invalidateFinanceCache();
+        invalidateStudentCache();
         showToast('Transaction deleted and balance updated.', 'success');
         if (studentId) renderStudentProfile(studentId);
         else renderFinance();
+        // PILL-RESET: If Record Payment is open with same student, re-run selectFeeStudent
+        // so month pills reflect the deletion immediately.
+        const _selStu = window._selectedFeeStudent;
+        if (_selStu && _selStu.id === studentId && currentView === 'recordFee') {
+          setTimeout(() => selectFeeStudent(_selStu.id, _selStu.name||'', _selStu.cs||''), 300);
+        }
 
       } catch(e) {
         // P-D #07: Actionable error — surface permission errors clearly
@@ -10201,7 +10828,7 @@ async function renderConcessionStudents() {
                   <th>Section</th>
                   <th>Parent Name</th>
                   <th>Standard Fee</th>
-                  <th style="color:var(--gold-lt)">Concession Fee</th>
+                  <th style="color:var(--gold-lt)">Fee After Concession</th>
                   <th>Set By</th>
                   <th>Date Set</th>
                   <th style="width:28px"></th>
@@ -10420,10 +11047,10 @@ function openConcessionEdit(docId, studentName, admissionNo, cls, currentFee, st
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);display:flex;align-items:center;justify-content:center;z-index:9999';
   modal.innerHTML = `
     <div style="background:var(--panel);border:1px solid var(--glass-border);border-radius:14px;padding:28px 32px;min-width:340px;max-width:440px">
-      <div style="font-size:16px;font-weight:700;color:var(--silver-hl);margin-bottom:4px">Edit Concession Fee</div>
+      <div style="font-size:16px;font-weight:700;color:var(--silver-hl);margin-bottom:4px">Edit Fee After Concession</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:18px">${sanitizeHTML(studentName)} · ${sanitizeHTML(admissionNo)} · ${sanitizeHTML(cls)}</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Standard fee: <strong style="color:var(--silver)">₹${fmtNum(stdFee)}</strong></div>
-      <label class="form-label" style="font-size:12px">Concession Fee (₹) *</label>
+      <label class="form-label" style="font-size:12px">Fee After Concession (₹) *</label>
       <input id="concessionFeeInput" class="form-control" type="number" min="0" step="50" value="${currentFee}" style="margin-bottom:16px">
       <div id="concessionEditAlert"></div>
       <div style="display:flex;gap:10px;margin-top:8px">
@@ -10550,141 +11177,7 @@ async function saveFeeStructure() {
 }
 
 // ════════════════════════════════════════════════
-// P-E #05 — EDIT FEE RECORD (Principal only)
-// Opens modal pre-filled with transaction data,
-// saves updated fields to Firestore, recalculates
-// student balance, re-renders profile on success.
-// ════════════════════════════════════════════════
-async function openEditTxModal(txId, studentId) {
-  if (currentRole !== 'principal') {
-    showToast('Only Principal can edit fee records.', 'danger');
-    return;
-  }
-
-  // Load tx from cache first, fallback to Firestore
-  const cached = (window._financeData || []).find(t => t.id === txId);
-  let tx = cached;
-  if (!tx) {
-    try {
-      const doc = await schoolCol('feeTransactions').doc(txId).get();
-      if (!doc.exists) { showToast('Transaction not found.', 'danger'); return; }
-      tx = { id: doc.id, ...doc.data() };
-    } catch(e) {
-      showToast('Error loading record: ' + e.message, 'danger');
-      return;
-    }
-  }
-
-  // Pre-fill form
-  document.getElementById('editTxId').value        = txId;
-  document.getElementById('editTxStudentId').value  = studentId;
-  document.getElementById('editTxFeeHead').value    = tx.feeHead    || 'Monthly Tuition Fee';
-  document.getElementById('editTxAmount').value     = tx.amountPaid || '';
-  document.getElementById('editTxMode').value       = tx.paymentMode|| 'Cash';
-  document.getElementById('editTxNotes').value      = tx.notes      || '';
-
-  // Format date for input[type=date] — expects YYYY-MM-DD
-  try {
-    const d = tx.date?.toDate ? tx.date.toDate() : new Date(tx.date);
-    document.getElementById('editTxDate').value = d.toISOString().split('T')[0];
-  } catch(_) { document.getElementById('editTxDate').value = ''; }
-
-  document.getElementById('editTxAlert').innerHTML = '';
-  document.getElementById('editTxOverlay').classList.add('open');
-}
-
-function closeEditTxModal() {
-  document.getElementById('editTxOverlay').classList.remove('open');
-}
-
-async function saveEditedTx() {
-  if (currentRole !== 'principal') return;
-
-  const txId      = document.getElementById('editTxId').value;
-  const studentId = document.getElementById('editTxStudentId').value;
-  const feeHead   = document.getElementById('editTxFeeHead').value.trim();
-  const amount    = parseFloat(document.getElementById('editTxAmount').value);
-  const mode      = document.getElementById('editTxMode').value;
-  const dateStr   = document.getElementById('editTxDate').value;
-  const notes     = document.getElementById('editTxNotes').value.trim();
-
-  // Validate
-  if (!feeHead || isNaN(amount) || amount < 0 || !mode || !dateStr) {
-    showFormAlert('editTxAlert', '❌ Please fill all required fields.', 'danger');
-    return;
-  }
-
-  const btn = document.getElementById('editTxSaveBtn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Saving…'; }
-
-  try {
-    // P-E: Force token refresh before write
-    await currentUser.getIdToken(true);
-
-    const dateObj = new Date(dateStr);
-    dateObj.setHours(12, 0, 0, 0); // Noon — avoids timezone boundary issues
-
-    const updates = {
-      feeHead,
-      amountPaid:      amount,
-      amountInWords:   numberToWords(amount) + ' Rupees Only',
-      paymentMode:     mode,
-      date:            firebase.firestore.Timestamp.fromDate(dateObj),
-      notes,
-      editedByName:    currentProfile?.name || 'Principal',
-      editedAt:        firebase.firestore.FieldValue.serverTimestamp(),
-    };
-
-    await schoolCol('feeTransactions').doc(txId).update(updates);
-
-    // Recalculate student balance from remaining transactions (same logic as P-D delete)
-    if (studentId) {
-      try {
-        const remaining = await schoolCol('feeTransactions')
-          .where('studentId', '==', studentId)
-          .get();
-        if (!remaining.empty) {
-          const sorted = remaining.docs
-            .map(d => ({ id:d.id, ...d.data() }))
-            .sort((a, b) => {
-              const ta = a.date?.toMillis ? a.date.toMillis() : new Date(a.date).getTime();
-              const tb = b.date?.toMillis ? b.date.toMillis() : new Date(b.date).getTime();
-              return tb - ta;
-            });
-          const latestTx = sorted[0];
-          await schoolCol('students').doc(studentId).update({
-            outstandingBalance: latestTx.remainingBalance  || 0,  // BUG-P05 FIX: Pending Fees, Dashboard stat card, and calcLockedFee() all read outstandingBalance — previously only remainingBalance was written, leaving outstandingBalance permanently stale after any edit
-            remainingBalance:   latestTx.remainingBalance  || 0,
-            lastPaymentDate:    latestTx.date              || null,
-            lastPaymentAmount:  latestTx.amountPaid        || 0,
-            updatedAt:          firebase.firestore.FieldValue.serverTimestamp()
-          });
-        }
-      } catch(balErr) {
-        console.warn('P-E: Balance recalc after edit failed:', balErr.message);
-      }
-    }
-
-    // Update cache entry if it exists
-    if (window._financeData) {
-      const idx = window._financeData.findIndex(t => t.id === txId);
-      if (idx !== -1) Object.assign(window._financeData[idx], updates);
-    }
-
-    invalidateFinanceCache();
-    closeEditTxModal();
-    showToast('Fee record updated successfully.', 'success');
-    if (studentId) renderStudentProfile(studentId);
-
-  } catch(e) {
-    const msg = e.code === 'permission-denied'
-      ? '❌ Permission denied. Firestore Rules must allow Principal to update feeTransactions.'
-      : '❌ Save failed: ' + e.message;
-    showFormAlert('editTxAlert', msg, 'danger');
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
-  }
-}
+// VLX-REF-002: openEditTxModal, closeEditTxModal, saveEditedTx removed — Edit functionality disabled.
 
 
 // The old code called navigate('recordFee') then relied on a 100ms timeout for renderRecordFee
@@ -10912,7 +11405,7 @@ async function showEditStudentModal(id) {
         </label>
         <input type="date" class="form-control" id="es_admissionDate"
           value="${s.admissionDate
-            ? (s.admissionDate.toDate ? s.admissionDate.toDate() : new Date(s.admissionDate)).toISOString().split('T')[0]
+            ? (()=>{const _ad=s.admissionDate.toDate?s.admissionDate.toDate():new Date(s.admissionDate);return `${_ad.getFullYear()}-${String(_ad.getMonth()+1).padStart(2,'0')}-${String(_ad.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */
             : ''}">
       </div>
     </div>` : `
@@ -11649,7 +12142,7 @@ async function runBulkPromotion() {
       return;
     }
 
-    const today      = new Date().toISOString().split('T')[0];
+    const today      = (()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */;
     const batch      = db.batch();
     const toTerminate = []; // collect for terminatedStudents writes (outside batch — need doc refs)
 
@@ -12007,49 +12500,16 @@ function _normaliseAcademicYear(ay) {
   return m[1] + '-' + shortEnd;
 }
 
-// ARC-012: Classify a pending entry as 'current' or 'previous' academic year
-// BUG-⑥ FIX: Read entry.academicYear directly when present.
-// Excel-imported students get createdAt = today (import date), so using createdAt
-// incorrectly classified them as current-year even when their academicYear = "2024-25".
+// ARC-012 + VLX-REF-006 FIX: Classify a pending entry as 'current' or 'previous'.
+// RULE: ALL students with dues appear in Current tab — terminated included.
+// ONLY exception: Hidden students are excluded entirely (never fetched).
 function _classifyDueYear(entry) {
-  if (entry.type === 'terminated') return 'previous';
-  const { yearStart, yearEnd } = _getAcademicYear();
-  const currentAcadYearLabel = yearStart + '\u2013' + yearEnd; // e.g. "2025–2026"
-
-  // Primary: use the academicYear string field if present
-  if (entry.academicYear) {
-    // Normalise separator: "2024-25", "2024–2025", "2024-2025" all accepted
-    const ay = String(entry.academicYear).trim();
-    // Extract the start year from the string (first 4-digit number)
-    const startYearMatch = ay.match(/(\d{4})/);
-    if (startYearMatch) {
-      const entryStartYear = parseInt(startYearMatch[1], 10);
-      return entryStartYear >= yearStart ? 'current' : 'previous';
-    }
-  }
-
-  // Fallback: use admissionDate (reliable for manually-entered students)
-  function toMs(val) {
-    if (!val) return null;
-    if (typeof val === 'object' && val.seconds) return val.seconds * 1000;
-    if (val instanceof Date) return val.getTime();
-    const p = new Date(val); return isNaN(p.getTime()) ? null : p.getTime();
-  }
-  const acadYearStartMs = new Date(yearStart, 5, 1).getTime();
-  const t = (entry.type || '').toLowerCase();
-
-  // 'existing' and 'legacy' students carry prior-year debt by definition.
-  if (t === 'existing' || t === 'legacy') return 'previous';
-
-  // For all other types ('new', 'promoted', blank): academicYear is now always
-  // populated at write time (import defaults to _getCurrentAcademicYearStr(), form
-  // sets it explicitly). If we reach here it means academicYear was absent on an
-  // older record — fall back to admissionDate as a best-effort signal.
-  const ts = toMs(entry.admissionDate);
-  if (!ts) return 'current';
-  return ts >= acadYearStartMs ? 'current' : 'previous';
+  // Hidden students must never appear — but they are not fetched at all,
+  // so this is a safety guard only.
+  if ((entry.type || '').toLowerCase() === 'hidden') return 'previous';
+  // Everyone else — active, terminated, legacy, existing, promoted — current tab.
+  return 'current';
 }
-
 async function renderPendingFee() {
   setActiveNav('pendingFee');
   setContent(`<div class="loader-wrap"><div class="spinner"></div></div>`);
@@ -12102,18 +12562,27 @@ async function renderPendingFee() {
 
     // ── 5. Build pending-dues list for ACTIVE students ─────────────────────
     const activePending = [];
+    const feeSchedule = getFeeSchedule();
+    const curYearStr = _getCurrentAcademicYearStr();
+
     Object.values(stuMap).forEach(s => {
+      if (s.status === 'terminated') return;
       const bal = balMap[s.id];
-      const outstanding = bal?.found ? bal.balance : (s.outstandingBalance || 0);
-      if (outstanding > 0 && s.status !== 'terminated') {
-        // BUG-FIX: carry academicYear (and openingOutstandingYear as fallback) from
-        // the student doc into the pending entry so _classifyDueYear() can read it.
-        // Without this, imported/existing students whose admissionDate = import-date
-        // were wrongly classified as current-year even when their dues are prior-year.
-        const resolvedAcadYear =
-          s.academicYear ||           // set by manual "Add Existing Student" form
-          s.openingOutstandingYear ||  // older field written by same form
-          '';                          // genuinely unknown → let classifier fall back
+      const txs = txsByStudent[s.id] || [];
+
+      // VLX-REF-006: Current year dues = fee×12 minus what was paid this year.
+      // ALL active students get this calculation regardless of their academicYear field,
+      // because academicYear may be set to an old year for multi-year-dues students.
+      const monthlyRate    = feeSchedule[s.class] || s.monthlyFee || 0;
+      const fullAnnualFee  = monthlyRate * 12;
+      const paidThisYear   = txs
+        .filter(t => _normaliseAcademicYear(t.academicYear || '') === _normaliseAcademicYear(curYearStr) || !t.academicYear)
+        .reduce((sum, t) => sum + (t.amountPaid || 0), 0);
+      const outstanding = monthlyRate
+        ? Math.max(0, fullAnnualFee - paidThisYear)
+        : Math.max(0, bal?.found ? bal.balance : (s.outstandingBalance || 0));
+
+      if (outstanding > 0) {
         activePending.push({
           studentId:    s.id,
           name:         s.name || '—',
@@ -12128,8 +12597,206 @@ async function renderPendingFee() {
           contact:      s.contact || '—',
           admissionDate: s.admissionDate || null,
           createdAt:    s.createdAt || null,
-          academicYear: resolvedAcadYear,  // ← KEY FIX: pass through for _classifyDueYear()
+          academicYear: curYearStr,
         });
+      }
+    });
+
+    // ── 5b. Build PREVIOUS YEAR dues — per-year from openingOutstandingDues[] ─
+    // Each active student may have dues across multiple past years stored in
+    // openingOutstandingDues[]. We build a year→students map for the accordion.
+    // Terminated students also contribute their stored outstandingBalance.
+    const prevYearMap = {}; // { "2024-25": [ {studentId,name,block,class,section,admissionNo,amountDue,parentName,contact}, … ] }
+
+    Object.values(stuMap).forEach(s => {
+      if (s.status === 'terminated') return;
+      const multiDues = Array.isArray(s.openingOutstandingDues) ? s.openingOutstandingDues : [];
+      if (multiDues.length > 0) {
+        multiDues.forEach(d => {
+          if (!d.year || !(d.amount > 0)) return;
+          const yr = d.year;
+          if (!prevYearMap[yr]) prevYearMap[yr] = [];
+          prevYearMap[yr].push({
+            studentId:  s.id,
+            name:       s.name || '—',
+            block:      s.block || '—',
+            class:      d.class || s.class || '—',
+            section:    s.section || '—',
+            admissionNo: s.admissionNumber || '—',
+            amountDue:  d.amount,
+            parentName: s.parentName || '—',
+            contact:    s.contact || '—',
+            type:       'active',
+          });
+        });
+      } else if (s.openingOutstandingYear && (s.outstandingBalance || 0) > 0) {
+        // Legacy single-year onboarding.
+        // BUG-FIX (VLX012→VLX013): For students merged from two Excel rows by
+        // _deduplicateRowsInSheet(), s.outstandingBalance is the COMBINED balance
+        // (older year + newer year). Using it here would double-count the newer
+        // year's dues because the isStoredYearNowPast branch below already handles
+        // the newer year's amount separately.
+        // Use s.previousDues (the older/opening year balance) if available;
+        // fall back to s.outstandingBalance only for true single-year onboarding
+        // where previousDues is not set.
+        const yr = s.openingOutstandingYear;
+        const openingAmt = (s.previousDues || 0) > 0
+          ? s.previousDues
+          : s.outstandingBalance;
+        if (!prevYearMap[yr]) prevYearMap[yr] = [];
+        prevYearMap[yr].push({
+          studentId:  s.id,
+          name:       s.name || '—',
+          block:      s.block || '—',
+          class:      s.openingOutstandingClass || s.class || '—',
+          section:    s.section || '—',
+          admissionNo: s.admissionNumber || '—',
+          amountDue:  openingAmt,
+          parentName: s.parentName || '—',
+          contact:    s.contact || '—',
+          type:       'active',
+        });
+      }
+
+      // ── STALE CURRENT-YEAR DUES ──────────────────────────────────────────────
+      // When a student was onboarded in a previous year (e.g. 2025-26) with
+      // currentYearDueMonths/currentYearDueBalance, those fields were stored as
+      // "current year" at import time. If the student's academicYear is now a
+      // past year (not 2026-27), those dues belong in the Previous Year accordion.
+      // We use s.academicYear as the year label for these dues.
+      const storedAcadYear = _normaliseAcademicYear(s.academicYear || '');
+      const normCurYear    = _normaliseAcademicYear(curYearStr);
+      const isStoredYearNowPast = storedAcadYear && storedAcadYear !== normCurYear;
+
+      if ((s.currentYearDueBalance || 0) > 0) {
+        // Determine which year label to use for these dues.
+        // s.currentYearDueYear = explicitly saved year label (new students going forward)
+        // s.academicYear = fallback (set to curAcadYear at save time for existing students)
+        const explicitDueYear = _normaliseAcademicYear(s.currentYearDueYear || '');
+        const fallbackDueYear = storedAcadYear;
+        const resolvedDueYear = explicitDueYear || fallbackDueYear;
+
+        // Only add to previous accordion if that year is now in the past
+        const dueYearIsPast = resolvedDueYear && resolvedDueYear !== normCurYear;
+
+        if (dueYearIsPast) {
+          if (!prevYearMap[resolvedDueYear]) prevYearMap[resolvedDueYear] = [];
+          // Only add if not already bucketed from openingOutstandingDues for this year
+          const alreadyAdded = prevYearMap[resolvedDueYear].some(r => r.studentId === s.id);
+          if (!alreadyAdded) {
+            prevYearMap[resolvedDueYear].push({
+              studentId:  s.id,
+              name:       s.name || '—',
+              block:      s.block || '—',
+              class:      s.class || '—',
+              section:    s.section || '—',
+              admissionNo: s.admissionNumber || '—',
+              amountDue:  s.currentYearDueBalance,
+              parentName: s.parentName || '—',
+              contact:    s.contact || '—',
+              type:       'active',
+            });
+          }
+        }
+      }
+
+      // ── PAST-YEAR DUES FROM academicYear / previousAcademicYear FIELDS ────────
+      // Students imported in 2025-26 have s.academicYear = "2025-26".
+      // Their DUE months are in s.monthStatus (the month grid for that year).
+      // If that academicYear is now a past year (not curYearStr), we calculate
+      // their 2025-26 outstanding and add them to prevYearMap for that year.
+      // This covers ALL students who were onboarded before the current year,
+      // including those whose existing paths above did not catch them.
+      //
+      // BUG-FIX (VLX012→VLX013): Previous priority list was WRONG:
+      //   ❌ OLD Priority 1 was s.previousDues — but s.previousDues is the OLDER
+      //      year's balance (e.g. 2024-25), NOT the storedAcadYear (e.g. 2025-26).
+      //      Using it here filed 2024-25 amounts under the 2025-26 bucket.
+      //
+      // Correct priority of due-amount sources for storedAcadYear:
+      //   1. DUE months in s.monthStatus × monthlyFee  (storedAcadYear's own month grid)
+      //   2. s.outstandingBalance − s.previousDues     (net newer-year balance)
+      //   3. s.outstandingBalance                       (last-resort fallback, single-year import)
+
+      if (isStoredYearNowPast) {
+        // Only proceed if not already added for this year via openingOutstandingDues path above
+        const alreadyIn = (prevYearMap[storedAcadYear] || []).some(r => r.studentId === s.id);
+        if (!alreadyIn) {
+          // Calculate due amount for storedAcadYear
+          const monthlyFeeForStu = feeSchedule[s.class] || s.monthlyFee || 0;
+          let dueAmt = 0;
+
+          if (s.monthStatus && typeof s.monthStatus === 'object') {
+            // Count DUE months in the stored month grid — this is storedAcadYear's own grid
+            const dueMonthCount = Object.values(s.monthStatus)
+              .filter(v => (v || '').toUpperCase() === 'DUE').length;
+            dueAmt = dueMonthCount * monthlyFeeForStu;
+          }
+
+          // Secondary fallback: net balance = combined outstanding minus the opening/older year portion
+          if (dueAmt === 0 && (s.outstandingBalance || 0) > 0) {
+            const olderYearAmt = s.previousDues || 0;
+            dueAmt = Math.max(0, s.outstandingBalance - olderYearAmt);
+          }
+
+          // Last-resort fallback (single-year import, no previousDues): use outstandingBalance as-is
+          if (dueAmt === 0 && (s.outstandingBalance || 0) > 0 && !(s.previousDues > 0)) {
+            dueAmt = s.outstandingBalance;
+          }
+
+          if (dueAmt > 0) {
+            if (!prevYearMap[storedAcadYear]) prevYearMap[storedAcadYear] = [];
+            prevYearMap[storedAcadYear].push({
+              studentId:   s.id,
+              name:        s.name || '—',
+              block:       s.block || '—',
+              class:       s.class || '—',
+              section:     s.section || '—',
+              admissionNo: s.admissionNumber || '—',
+              amountDue:   dueAmt,
+              parentName:  s.parentName || '—',
+              contact:     s.contact || '—',
+              type:        'active',
+            });
+          }
+        }
+      }
+
+      // ── PREVIOUS-ACADEMIC-YEAR DUES (s.previousAcademicYear field) ────────────
+      // For students with two-year import rows (e.g. 2024-25 row + 2025-26 row),
+      // the older year is stored as s.previousAcademicYear with dues in s.previousDues
+      // and month grid in s.previousYearMonthStatus / s.prevYearMonthStatus.
+      const prevAcadYrNorm = _normaliseAcademicYear(s.previousAcademicYear || '');
+      if (prevAcadYrNorm && prevAcadYrNorm !== normCurYear) {
+        const alreadyInPrev = (prevYearMap[prevAcadYrNorm] || []).some(r => r.studentId === s.id);
+        if (!alreadyInPrev) {
+          const monthlyFeeForStu = feeSchedule[s.class] || s.monthlyFee || 0;
+          let prevDueAmt = 0;
+
+          if ((s.previousDues || 0) > 0) {
+            prevDueAmt = s.previousDues;
+          } else {
+            const prevGrid = s.previousYearMonthStatus || s.prevYearMonthStatus || {};
+            const dueCnt   = Object.values(prevGrid).filter(v => (v||'').toUpperCase()==='DUE').length;
+            prevDueAmt = dueCnt * monthlyFeeForStu;
+          }
+
+          if (prevDueAmt > 0) {
+            if (!prevYearMap[prevAcadYrNorm]) prevYearMap[prevAcadYrNorm] = [];
+            prevYearMap[prevAcadYrNorm].push({
+              studentId:   s.id,
+              name:        s.name || '—',
+              block:       s.block || '—',
+              class:       s.class || '—',
+              section:     s.section || '—',
+              admissionNo: s.admissionNumber || '—',
+              amountDue:   prevDueAmt,
+              parentName:  s.parentName || '—',
+              contact:     s.contact || '—',
+              type:        'active',
+            });
+          }
+        }
       }
     });
 
@@ -12138,7 +12805,7 @@ async function renderPendingFee() {
     Object.values(termMap).forEach(t => {
       const outstanding = t.outstandingBalance || 0;
       if (outstanding > 0) {
-        termPending.push({
+        const termRow = {
           studentId:   t.studentId || t.id,
           name:        t.studentName || '—',
           block:       t.block || currentViewBlock || '—',
@@ -12152,19 +12819,58 @@ async function renderPendingFee() {
           contact:     t.contact || '—',
           admissionDate: t.admissionDate || null,
           createdAt:   t.createdAt || t.terminationDate || null,
-        });
+          academicYear: t.academicYear || t.openingOutstandingYear || '',
+        };
+        termPending.push(termRow);
+        // Also bucket into prevYearMap so terminated dues appear in Previous Year accordion
+        const termYr = t.academicYear || t.openingOutstandingYear || '';
+        if (termYr && termYr !== curYearStr) {
+          if (!prevYearMap[termYr]) prevYearMap[termYr] = [];
+          prevYearMap[termYr].push({ ...termRow });
+        }
       }
     });
 
-    const allPending = [...activePending, ...termPending];
+    // currentYearPending = activePending (all active students — fee×12-paid)
+    // previousYearPending = flat list from prevYearMap for tab count badge + legacy table
+    const previousYearPending = Object.values(prevYearMap).flat();
+    const currentYearPending  = activePending;
+    // allPending = union of both (for ledger total + export)
+    const allPending = [...activePending, ...previousYearPending];
 
-    // ── ARC-012: Split into current-year and previous-year sub-sections ────
-    const currentYearPending  = allPending.filter(r => _classifyDueYear(r) === 'current');
-    const previousYearPending = allPending.filter(r => _classifyDueYear(r) === 'previous');
+    // ── PER-ACADEMIC-YEAR BREAKDOWN for KPI stat cards ───────────────────────
+    const curYrStr = curYearStr;
+    const yearBreakdownMap = {};
+
+    // Current year bucket
+    if (activePending.length > 0) {
+      yearBreakdownMap[curYrStr] = {
+        count: activePending.length,
+        total: activePending.reduce((s,r)=>s+r.amountDue,0),
+        isCurrent: true,
+      };
+    }
+    // Previous year buckets from prevYearMap
+    Object.entries(prevYearMap).forEach(([yr, rows]) => {
+      if (!rows.length) return;
+      yearBreakdownMap[yr] = {
+        count: rows.length,
+        total: rows.reduce((s,r)=>s+r.amountDue,0),
+        isCurrent: false,
+      };
+    });
+
+    // Sort years reverse-chronological
+    const yearBreakdownSorted = Object.entries(yearBreakdownMap).sort((a, b) => {
+      const ya = parseInt((a[0]||'').split('-')[0] || '0');
+      const yb = parseInt((b[0]||'').split('-')[0] || '0');
+      return yb - ya;
+    });
 
     window._pfAllPending     = allPending;
     window._pfCurrentPending = currentYearPending;
     window._pfPrevPending    = previousYearPending;
+    window._pfPrevYearMap    = prevYearMap; // per-year accordion data
 
     // ── 7. Build select options ────────────────────────────────────────────
     const blockOpts   = ['', ...getBlocks()];
@@ -12268,7 +12974,8 @@ async function renderPendingFee() {
       ? `<span style="font-size:12px;padding:2px 10px;border-radius:10px;font-weight:600;margin-left:8px;background:${currentViewBlock==='Boys Block'?'rgba(168,188,208,0.14)':'rgba(201,168,76,0.14)'};color:${currentViewBlock==='Boys Block'?'var(--silver-lt)':'var(--gold-lt)'}">${currentViewBlock}</span>`
       : '';
 
-    const totalGrand = allPending.reduce((s,r)=>s+r.amountDue,0);
+    const totalGrand = activePending.reduce((s,r)=>s+r.amountDue,0)
+                     + previousYearPending.reduce((s,r)=>s+r.amountDue,0);
     const curCount   = currentYearPending.length;
     const prevCount  = previousYearPending.length;
     const curTotal   = currentYearPending.reduce((s,r)=>s+r.amountDue,0);
@@ -12305,7 +13012,7 @@ async function renderPendingFee() {
       <div class="page-head flex-between">
         <div>
           <div class="page-title">Due Fee ${blockLabel}</div>
-          <div class="page-sub">Academic Year ${acYear.label} — ${allPending.length} student${allPending.length!==1?'s':''} with outstanding dues · Total ₹${fmtNum(totalGrand)}</div>
+          <div class="page-sub">${yearBreakdownSorted.length > 1 ? yearBreakdownSorted.map(([yr])=>yr).join(', ') : acYear.label} — ${allPending.length} student${allPending.length!==1?'s':''} with outstanding dues · Total ₹${fmtNum(totalGrand)} <span style="font-size:11px;color:var(--warn);margin-left:8px">⚡ Full annual dues shown from Day 1 (monthly fee × 12)</span></div>
         </div>
       </div>
 
@@ -12332,23 +13039,31 @@ async function renderPendingFee() {
         </div>
       </div>
 
-      <!-- ARC-012 KPI summary — combined overview -->
+      <!-- ARC-012 KPI summary — per-academic-year breakdown -->
       <div class="stats-grid" id="pfStatsGrid" style="margin-bottom:18px">
         <div class="stat-card red" id="pfStatTotal">
           <div class="stat-label">🔴 Total Students with Dues</div>
           <div class="stat-value">${allPending.length}</div>
-          <div class="stat-sub">Both years combined</div>
+          <div class="stat-sub">All years combined</div>
         </div>
-        <div class="stat-card" id="pfStatCurrent">
-          <div class="stat-label">📅 Current Year Dues (${acYear.label})</div>
-          <div class="stat-value" style="color:var(--gold-lt)">${curCount} · ₹${fmtNum(curTotal)}</div>
-          <div class="stat-sub">Admitted this academic year</div>
-        </div>
-        <div class="stat-card" style="border-color:rgba(74,158,202,0.35)" id="pfStatPrev">
-          <div class="stat-label">🕐 Previous Year Outstanding</div>
-          <div class="stat-value" style="color:var(--info)">${prevCount} · ₹${fmtNum(prevTotal)}</div>
-          <div class="stat-sub">Carried forward balances</div>
-        </div>
+        ${yearBreakdownSorted.map(([yr, info]) => {
+          const isCur = info.isCurrent;
+          const accentColor = isCur ? 'var(--gold-lt)' : 'var(--info)';
+          const borderStyle = isCur
+            ? 'border-color:rgba(201,168,76,0.45)'
+            : 'border-color:rgba(74,158,202,0.35)';
+          const icon = isCur ? '📅' : '🕐';
+          const label = isCur ? `Current Year (${yr})` : `Prev Year (${yr})`;
+          const sub   = isCur
+            ? `Fee × 12 minus paid · ${info.count} student${info.count!==1?'s':''}`
+            : `Carried forward · ${info.count} student${info.count!==1?'s':''}`;
+          return `
+            <div class="stat-card" style="${borderStyle}">
+              <div class="stat-label">${icon} ${label}</div>
+              <div class="stat-value" style="color:${accentColor}">${info.count} · ₹${fmtNum(info.total)}</div>
+              <div class="stat-sub">${sub}</div>
+            </div>`;
+        }).join('')}
       </div>
 
       <!-- ARC-012: Sub-section tabs -->
@@ -12357,17 +13072,17 @@ async function renderPendingFee() {
           📅 Current Academic Year Dues
           <span class="due-fee-tab-count" id="tabCountCurrent">${curCount}</span>
         </button>
-        <button class="due-fee-tab tab-prev ${activeAy==='prev'?'active':''}" onclick="pfSwitchTab('prev')">
+        ${prevCount > 0 ? `<button class="due-fee-tab tab-prev ${activeAy==='prev'?'active':''}" onclick="pfSwitchTab('prev')">
           🕐 Previous Year Outstanding Dues
           <span class="due-fee-tab-count" id="tabCountPrev">${prevCount}</span>
-        </button>
+        </button>` : ''}
       </div>
 
       <!-- ═══ SUB-SECTION: CURRENT ACADEMIC YEAR ═══ -->
       <div class="due-fee-subsection ${activeAy==='current'?'active':''}" id="pfSubCurrent">
         <div class="alert alert-success" style="margin-bottom:18px">
           <strong>📅 Current Academic Year Dues — ${acYear.label}</strong><br>
-          Students admitted from June ${acYear.yearStart} onwards with outstanding balances.
+          All active students with outstanding dues for the current academic year (full annual fee × 12 minus paid).
         </div>
         ${_filterHtml('pfCur', _pfFilters)}
         ${_tableHtml('pfCur','Current Year Due Records','Current')}
@@ -12377,16 +13092,131 @@ async function renderPendingFee() {
       <div class="due-fee-subsection ${activeAy==='prev'?'active':''}" id="pfSubPrev">
         <div class="alert alert-info" style="margin-bottom:18px">
           <strong>🕐 Previous Year Outstanding Dues</strong><br>
-          Balances carried forward from academic years prior to ${acYear.label}. Includes terminated students with unpaid dues.
+          Balances carried forward from academic years prior to ${acYear.label}. Click a year card to expand and view the student list. Each year has its own search and filters.
         </div>
-        ${_filterHtml('pfPrev', _pfPrevFilters)}
-        ${_tableHtml('pfPrev','Previous Year Due Records','Previous')}
+        <div id="pfPrevAccordion">
+          ${(() => {
+            // Store all rows per year globally so JS search can re-render
+            window._pfPrevYearRows = window._pfPrevYearRows || {};
+            const entries = Object.entries(prevYearMap).sort((a,b)=>b[0].localeCompare(a[0]));
+            if (!entries.length) return '<div style="text-align:center;padding:40px;color:var(--muted)">No previous year dues found.</div>';
+
+            // Collect unique blocks/classes across all years for filter dropdowns
+            const allBlocks  = [...new Set(Object.values(prevYearMap).flat().map(r=>r.block).filter(Boolean))].sort();
+            const allClasses = [...new Set(Object.values(prevYearMap).flat().map(r=>r.class).filter(Boolean))].sort((a,b)=>{
+              const na=parseInt(a)||0, nb=parseInt(b)||0;
+              return na!==nb ? na-nb : a.localeCompare(b);
+            });
+
+            return entries.map(([yr, rows]) => {
+              const yrTotal = rows.reduce((s,r)=>s+r.amountDue,0);
+              const yrId    = 'prevYr_' + yr.replace(/[^a-z0-9]/gi,'_');
+              // Store rows so runtime search can filter them
+              window._pfPrevYearRows[yrId] = rows;
+
+              const blockOpts  = ['<option value="">All Blocks</option>',  ...allBlocks.map( b=>`<option value="${b}">${b}</option>`)].join('');
+              const classOpts  = ['<option value="">All Classes</option>', ...allClasses.map(c=>`<option value="${c}">${c}</option>`)].join('');
+
+              return `
+              <div class="card" style="margin-bottom:14px;border-color:rgba(74,158,202,0.30)">
+                <div class="card-hdr" style="cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center"
+                     onclick="_pfTogglePrevYear('${yrId}',this)">
+                  <div style="display:flex;align-items:center;gap:12px">
+                    <span style="font-size:16px">🕐</span>
+                    <div>
+                      <div class="card-title" style="color:var(--info)">Academic Year ${yr}</div>
+                      <div style="font-size:12px;color:var(--muted);margin-top:2px">
+                        <span id="${yrId}_count">${rows.length}</span> student${rows.length!==1?'s':''} ·
+                        <span id="${yrId}_total">₹${fmtNum(yrTotal)}</span> outstanding
+                      </div>
+                    </div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:14px">
+                    <span id="${yrId}_headerTotal" style="font-size:22px;font-weight:700;color:var(--info)">₹${fmtNum(yrTotal)}</span>
+                    <span id="${yrId}_chevron" style="font-size:18px;color:var(--muted);transition:transform 0.2s">▾</span>
+                  </div>
+                </div>
+                <div id="${yrId}_body" style="display:none">
+                  <!-- ── Per-year Search & Filter Bar ── -->
+                  <div style="padding:14px 18px;border-bottom:1px solid var(--glass-border);background:rgba(0,0,0,0.18)">
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end">
+                      <div style="display:flex;flex-direction:column;gap:4px">
+                        <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Block</label>
+                        <select id="${yrId}_blockF" class="filter-bar-select" style="min-width:130px;padding:7px 10px;font-size:12px"
+                          onchange="_pfPrevYrSearch('${yrId}')">
+                          ${blockOpts}
+                        </select>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:4px">
+                        <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Class</label>
+                        <select id="${yrId}_classF" class="filter-bar-select" style="min-width:130px;padding:7px 10px;font-size:12px"
+                          onchange="_pfPrevYrSearch('${yrId}')">
+                          ${classOpts}
+                        </select>
+                      </div>
+                      <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:180px">
+                        <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px">Search</label>
+                        <div style="position:relative">
+                          <span style="position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none">🔍</span>
+                          <input type="text" id="${yrId}_searchF" class="filter-bar-input"
+                            style="padding:7px 10px 7px 30px;font-size:12px;width:100%"
+                            placeholder="Student name · Adm# · Parent · Class"
+                            oninput="_pfPrevYrSearch('${yrId}')">
+                        </div>
+                      </div>
+                      <div style="display:flex;align-items:flex-end">
+                        <button class="btn btn-ghost btn-sm" onclick="_pfPrevYrReset('${yrId}')"
+                          style="padding:7px 14px;font-size:12px">✕ Clear</button>
+                      </div>
+                      <div style="display:flex;align-items:flex-end;margin-left:auto">
+                        <span id="${yrId}_filterInfo" style="font-size:11px;color:var(--info);opacity:0.8"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- ── Table ── -->
+                  <div class="card-body" style="padding:0">
+                    <div class="tbl-wrap">
+                      <table>
+                        <thead>
+                          <tr><th>Block</th><th>Name</th><th>Adm#</th><th>Class / Sec</th><th>Parent</th><th>Contact</th><th>Amount Due</th><th>Type</th><th>Action</th></tr>
+                        </thead>
+                        <tbody id="${yrId}_tbody">
+                          ${rows.map(row => {
+                            const blockBadge = row.block
+                              ? `<span style="font-size:10px;background:${row.block==='Boys Block'?'rgba(168,188,208,0.14)':'rgba(201,168,76,0.14)'};color:${row.block==='Boys Block'?'var(--silver-lt)':'var(--gold-lt)'};padding:2px 7px;border-radius:10px;font-weight:600">${row.block}</span>`
+                              : '—';
+                            const typeBadge = row.type === 'terminated'
+                              ? `<span class="badge badge-red" style="font-size:10px">Terminated</span>`
+                              : `<span class="badge badge-green" style="font-size:10px">Active</span>`;
+                            const action = (currentRole==='principal' && row.type!=='terminated')
+                              ? `<button class="btn btn-primary btn-sm" onclick="navigate('pastDue')">Record Dues</button>`
+                              : `<span style="font-size:11px;color:var(--muted)">—</span>`;
+                            return `<tr>
+                              <td>${blockBadge}</td>
+                              <td><strong>${row.name}</strong></td>
+                              <td class="muted">${row.admissionNo}</td>
+                              <td>${row.class} ${row.section}</td>
+                              <td style="font-size:13px">${row.parentName||'—'}</td>
+                              <td style="font-size:13px;color:var(--info)">${row.contact||'—'}</td>
+                              <td style="color:var(--danger);font-weight:700">₹${fmtNum(row.amountDue)}</td>
+                              <td>${typeBadge}</td>
+                              <td>${action}</td>
+                            </tr>`;
+                          }).join('')}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>`;
+            }).join('');
+          })()}
+        </div>
       </div>
     `);
 
-    // ── 8. Render both sub-sections
+    // ── 8. Render current sub-section (previous year uses inline accordion)
     pfCurApply();
-    pfPrevApply();
 
   } catch(e) {
     setContent(`<div class="alert alert-danger" style="margin:24px">Error loading Due Fee: ${e.message}</div>`);
@@ -12742,8 +13572,95 @@ async function pfPrevExportPDF() {
 }
 
 // Legacy stubs — keep for any external references
-function pfApplyFilters() { pfCurApply(); pfPrevApply(); }
-function pfResetFilters()  { pfCurReset(); pfPrevReset(); }
+function pfApplyFilters() { pfCurApply(); }
+function pfResetFilters()  { pfCurReset(); }
+
+// Toggle a previous-year accordion card open/closed
+function _pfTogglePrevYear(yrId, headerEl) {
+  const body    = document.getElementById(yrId + '_body');
+  const chevron = document.getElementById(yrId + '_chevron');
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  body.style.display    = isOpen ? 'none'   : 'block';
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+  if (chevron) chevron.style.color     = isOpen ? 'var(--muted)' : 'var(--info)';
+}
+
+// ── Per-year accordion search/filter (Previous Year tab) ──────────────────
+function _pfPrevYrSearch(yrId) {
+  const allRows = (window._pfPrevYearRows || {})[yrId] || [];
+  const block   = (document.getElementById(yrId + '_blockF')?.value  || '').trim();
+  const cls     = (document.getElementById(yrId + '_classF')?.value  || '').trim();
+  const q       = (document.getElementById(yrId + '_searchF')?.value || '').trim().toLowerCase();
+
+  const filtered = allRows.filter(row => {
+    if (block && row.block !== block) return false;
+    if (cls   && row.class !== cls)   return false;
+    if (q && !(
+      (row.name       || '').toLowerCase().includes(q) ||
+      (row.admissionNo|| '').toLowerCase().includes(q) ||
+      (row.parentName || '').toLowerCase().includes(q) ||
+      (row.class      || '').toLowerCase().includes(q) ||
+      (row.contact    || '').toLowerCase().includes(q)
+    )) return false;
+    return true;
+  });
+
+  const tbody     = document.getElementById(yrId + '_tbody');
+  const infoEl    = document.getElementById(yrId + '_filterInfo');
+  const totalEl   = document.getElementById(yrId + '_headerTotal');
+  const subEl     = document.getElementById(yrId + '_total');
+  const countEl   = document.getElementById(yrId + '_count');
+  const filteredTotal = filtered.reduce((s,r)=>s+r.amountDue,0);
+
+  if (infoEl) {
+    const isFiltered = block || cls || q;
+    infoEl.textContent = isFiltered
+      ? `Showing ${filtered.length} of ${allRows.length} · ₹${fmtNum(filteredTotal)}`
+      : '';
+  }
+  if (totalEl) totalEl.textContent = '₹' + fmtNum(filteredTotal);
+  if (subEl)   subEl.textContent   = '₹' + fmtNum(filteredTotal);
+  if (countEl) countEl.textContent = filtered.length;
+
+  if (!tbody) return;
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--muted)">No students match the selected filters.</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = filtered.map(row => {
+    const blockBadge = row.block
+      ? `<span style="font-size:10px;background:${row.block==='Boys Block'?'rgba(168,188,208,0.14)':'rgba(201,168,76,0.14)'};color:${row.block==='Boys Block'?'var(--silver-lt)':'var(--gold-lt)'};padding:2px 7px;border-radius:10px;font-weight:600">${row.block}</span>`
+      : '—';
+    const typeBadge = row.type === 'terminated'
+      ? `<span class="badge badge-red" style="font-size:10px">Terminated</span>`
+      : `<span class="badge badge-green" style="font-size:10px">Active</span>`;
+    const action = (currentRole==='principal' && row.type!=='terminated')
+      ? `<button class="btn btn-primary btn-sm" onclick="navigate('pastDue')">Record Dues</button>`
+      : `<span style="font-size:11px;color:var(--muted)">—</span>`;
+    return `<tr>
+      <td>${blockBadge}</td>
+      <td><strong>${row.name}</strong></td>
+      <td class="muted">${row.admissionNo}</td>
+      <td>${row.class} ${row.section}</td>
+      <td style="font-size:13px">${row.parentName||'—'}</td>
+      <td style="font-size:13px;color:var(--info)">${row.contact||'—'}</td>
+      <td style="color:var(--danger);font-weight:700">₹${fmtNum(row.amountDue)}</td>
+      <td>${typeBadge}</td>
+      <td>${action}</td>
+    </tr>`;
+  }).join('');
+}
+
+function _pfPrevYrReset(yrId) {
+  const blockF  = document.getElementById(yrId + '_blockF');
+  const classF  = document.getElementById(yrId + '_classF');
+  const searchF = document.getElementById(yrId + '_searchF');
+  if (blockF)  blockF.value  = '';
+  if (classF)  classF.value  = '';
+  if (searchF) searchF.value = '';
+  _pfPrevYrSearch(yrId);
+}
 function _pfRenderChart(f) { /* replaced by _pfRenderSubChart */ }
 function _pfShowExports()  { /* no-op — exports always visible */ }
 function _pfHideExports()  { /* no-op */ }
@@ -13038,7 +13955,7 @@ function renderPastDue(params = {}) {
             <!-- Date -->
             <div class="form-group">
               <label class="form-label">Payment Date *</label>
-              <input type="date" class="form-control" id="pastDueDate" value="${new Date().toISOString().split('T')[0]}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
+              <input type="date" class="form-control" id="pastDueDate" value="${(()=>{const _d=new Date();return `${_d.getFullYear()}-${String(_d.getMonth()+1).padStart(2,'0')}-${String(_d.getDate()).padStart(2,'0')}`;})() /* BUG-TS-001 FIX */}" readonly style="background:var(--depth);cursor:not-allowed;color:var(--gold-lt);font-weight:600;border-color:rgba(212,150,42,0.3)">
               <div style="font-size:11px;color:var(--muted);margin-top:4px">🔒 Auto-set to today's date — read-only</div>
             </div>
 
@@ -13164,13 +14081,62 @@ async function _pastDuePick(sid) {
   // Fix #2: Show remaining balance by academic year
 
   // Point 10: Show previous-year outstanding dues context banner
+  // BUG-FIX (VLX012→VLX013): s.outstandingBalance is COMBINED (all years) for two-year
+  // import students. Show a per-year breakdown instead so the clerk sees exact amounts.
   const _pdCtxEl = document.getElementById('_pastDueCtxBanner');
   if (_pdCtxEl) {
     _pdCtxEl.style.display = 'block';
-    const _prevDue = typeof s.outstandingBalance === 'number' ? s.outstandingBalance : (parseFloat(s.outstandingBalance) || 0);
-    _pdCtxEl.innerHTML = _prevDue > 0
-      ? `<span style="color:var(--warn);font-size:12px">⚠️ Previous Year Outstanding: <strong>₹${fmtNum(_prevDue)}</strong> — select year &amp; months below to clear</span>`
-      : `<span style="color:var(--muted);font-size:12px">📅 Select the previous academic year and months to record dues</span>`;
+    const _normYrBanner = y => {
+      if (!y) return '';
+      const s2 = String(y).trim().replace(/[–—]/g, '-');
+      const m  = s2.match(/^(\d{4})-(\d{2,4})$/);
+      if (!m) return s2;
+      return m[1] + '-' + (m[2].length === 4 ? m[2].slice(2) : m[2]);
+    };
+
+    // Build per-year balance map from all sources on the student doc
+    const _bannerYearMap = {};
+    // Source 1: two-year Excel import — newer year
+    const _sDocYear = _normYrBanner(s.academicYear);
+    const _monthlyFeeB = s.monthlyFee || 0;
+    if (_sDocYear) {
+      const _dueFromGrid = Object.values(s.monthStatus || {})
+        .filter(v => (v || '').toUpperCase() === 'DUE').length * _monthlyFeeB;
+      const _newerAmt = _dueFromGrid > 0
+        ? _dueFromGrid
+        : Math.max(0, (s.outstandingBalance || 0) - (s.previousDues || 0));
+      if (_newerAmt > 0) _bannerYearMap[_sDocYear] = (_bannerYearMap[_sDocYear] || 0) + _newerAmt;
+    }
+    // Source 2: older year from Excel import (previousAcademicYear / previousDues)
+    const _prevYrB = _normYrBanner(s.previousAcademicYear);
+    if (_prevYrB && (s.previousDues || 0) > 0) {
+      _bannerYearMap[_prevYrB] = (_bannerYearMap[_prevYrB] || 0) + s.previousDues;
+    }
+    // Source 3: openingOutstandingDues[] — multi-year manual onboarding
+    if (Array.isArray(s.openingOutstandingDues)) {
+      s.openingOutstandingDues.forEach(d => {
+        if (d.year && d.amount > 0) {
+          const _ky = _normYrBanner(d.year);
+          _bannerYearMap[_ky] = (_bannerYearMap[_ky] || 0) + d.amount;
+        }
+      });
+    }
+    // Source 4: single-year manual onboarding fallback
+    const _openingYrB = _normYrBanner(s.openingOutstandingYear);
+    if (_openingYrB && !_bannerYearMap[_openingYrB] && (s.outstandingBalance || 0) > 0) {
+      _bannerYearMap[_openingYrB] = s.previousDues > 0 ? s.previousDues : s.outstandingBalance;
+    }
+
+    const _totalBanner = Object.values(_bannerYearMap).reduce((a, b) => a + b, 0);
+    if (_totalBanner > 0) {
+      const _yearLines = Object.entries(_bannerYearMap)
+        .sort((a, b) => b[0].localeCompare(a[0]))
+        .map(([yr, amt]) => `<span style="margin-right:12px">📅 <strong>${yr}:</strong> ₹${fmtNum(amt)}</span>`)
+        .join('');
+      _pdCtxEl.innerHTML = `<span style="color:var(--warn);font-size:12px">⚠️ Previous Year Outstanding — ${_yearLines}<br><span style="color:var(--muted)">Select year &amp; months below to clear dues year by year</span></span>`;
+    } else {
+      _pdCtxEl.innerHTML = `<span style="color:var(--muted);font-size:12px">📅 Select the previous academic year and months to record dues</span>`;
+    }
   }
 
   // ── AUTO-DETECT: previous academic year ─────────────────────────────────
@@ -13190,31 +14156,27 @@ async function _pastDuePick(sid) {
     const currentYearStr = _getCurrentAcademicYearStr(); // e.g. "2026-27"
     const studentYearsSet = new Set();
 
-    // Always include current year and the 2 years before it
-    const _yn = new Date();
-    const _yCur = _yn.getMonth() >= 5 ? _yn.getFullYear() : _yn.getFullYear() - 1;
-    for (let i = 0; i <= 2; i++) {
-      const ys = _yCur - i;
-      studentYearsSet.add(_normaliseAcademicYear(ys + '-' + String(ys + 1).slice(2)));
+    // ── Collect ONLY years that have actual data for this student ──
+    // Priority sources (student-specific data):
+    // 1. openingOutstandingDues[] — multi-year manual onboarding
+    if (Array.isArray(s.openingOutstandingDues)) {
+      s.openingOutstandingDues.forEach(entry => {
+        if (entry.year) studentYearsSet.add(_normaliseAcademicYear(entry.year.trim()));
+      });
     }
-
-    // openingOutstandingYear from manual onboarding
+    // 2. openingOutstandingYear — single-year manual onboarding
     if (s.openingOutstandingYear) {
       studentYearsSet.add(_normaliseAcademicYear(s.openingOutstandingYear.trim()));
     }
-
-    // previousAcademicYear — written by _deduplicateRowsInSheet during Excel import
-    // This is the KEY field that holds 2024-25 when the sheet has both years
+    // 3. previousAcademicYear — written by _deduplicateRowsInSheet during Excel import
     if (s.previousAcademicYear) {
       studentYearsSet.add(_normaliseAcademicYear(s.previousAcademicYear.trim()));
     }
-
-    // academicYear on the student doc (the current/newer year from Excel import)
+    // 4. academicYear on the student doc (current/newer year from Excel import or onboarding)
     if (s.academicYear) {
       studentYearsSet.add(_normaliseAcademicYear(s.academicYear.trim()));
     }
-
-    // Years from this student's own fee transactions
+    // 5. Years from this student's own fee transactions
     try {
       const txSnap = await schoolCol('feeTransactions')
         .where('studentId', '==', sid)
@@ -13225,15 +14187,26 @@ async function _pastDuePick(sid) {
       });
     } catch(_) {}
 
-    // Sort descending
+    // Fallback: if NO student-specific year was found at all, show last 2 past years
+    // so the clerk still has something to select from (edge case — legacy data).
+    if (studentYearsSet.size === 0) {
+      const _yn = new Date();
+      const _yCur = _yn.getMonth() >= 5 ? _yn.getFullYear() : _yn.getFullYear() - 1;
+      for (let i = 1; i <= 2; i++) {
+        const ys = _yCur - i;
+        studentYearsSet.add(_normaliseAcademicYear(ys + '-' + String(ys + 1).slice(2)));
+      }
+    }
+
+    // VLX-REF-005 FIX: Strip current year from ALL sources — final gate.
     const studentYears = Array.from(studentYearsSet)
-      .filter(Boolean)
+      .filter(yr => Boolean(yr) && yr !== currentYearStr)
       .sort((a, b) => b.localeCompare(a));
 
     studentYears.forEach(label => {
       const opt = document.createElement('option');
       opt.value = label;
-      opt.textContent = label === currentYearStr ? label + ' (Current Year)' : label;
+      opt.textContent = label;
       yearSel.appendChild(opt);
     });
 
@@ -13270,6 +14243,50 @@ async function _pastDuePick(sid) {
   // ── AUTO-DETECT: unpaid months for the auto-detected year ───────────────
   // Fetch actual transactions, then auto-select months that were set during onboarding
   // but have not been paid yet. Green = already paid. Red = still owed. White = not applicable.
+  // ── GUARD: New student enrolled in current A.Y. — no previous year dues ──
+  // Conditions: student.academicYear == curAcadYear AND no previousAcademicYear
+  // AND no openingOutstandingYear AND outstandingBalance == 0.
+  // → Keep form locked, show a friendly "no dues" notice instead.
+  const _curYrGuard    = _getCurrentAcademicYearStr();
+  const _normStuYr     = _normaliseAcademicYear(s.academicYear || '');
+  const _hasPrevYr     = !!(s.previousAcademicYear || s.openingOutstandingYear);
+  const _hasBalance    = (s.outstandingBalance || 0) > 0 || (s.previousDues || 0) > 0;
+  const _hasMultiYearDues = Array.isArray(s.openingOutstandingDues) && s.openingOutstandingDues.length > 0;
+  const _isNewEnrollee = (_normStuYr === _curYrGuard || !s.academicYear) && !_hasPrevYr && !_hasBalance && !_hasMultiYearDues;
+
+  if (_isNewEnrollee) {
+    // Hide the generic lock notice so it doesn't confuse
+    const lockNotice = document.getElementById('pastDueLockNotice');
+    if (lockNotice) lockNotice.style.display = 'none';
+    // Show a clear green "no dues" alert
+    const alertEl = document.getElementById('pastDueAlert');
+    if (alertEl) {
+      alertEl.innerHTML = `
+        <div style="padding:14px 16px;border-radius:10px;margin-bottom:14px;
+          background:rgba(82,200,122,0.10);border:1px solid rgba(82,200,122,0.30);
+          display:flex;align-items:flex-start;gap:12px">
+          <span style="font-size:20px;flex-shrink:0;line-height:1">✅</span>
+          <div>
+            <div style="font-weight:700;color:var(--success);font-size:13px;margin-bottom:5px">
+              No Previous Year Dues — New Student
+            </div>
+            <div style="font-size:12px;color:var(--muted);line-height:1.7">
+              <strong style="color:var(--text)">${sanitizeHTML(s.name)}</strong> was enrolled in
+              <strong style="color:var(--gold-lt)">${_curYrGuard}</strong> — the current academic year.
+              <br>This student has <strong style="color:var(--success)">no outstanding dues</strong>
+              from any previous year.
+              <br><br>To record a fee payment for the current year, use
+              <a href="#" onclick="pushNav('recordFee',{studentId:'${s.id}',studentName:'${(s.name||'').replace(/['"]/g,'')}'});return false;"
+                style="color:var(--gold-lt);font-weight:700;text-decoration:underline">
+                Record Payment
+              </a> from their student profile.
+            </div>
+          </div>
+        </div>`;
+    }
+    return; // form stays locked — nothing more to do
+  }
+
   await _pastDueLoadMonthGrid(autoYear, sid, s.openingOutstandingMonths || [], s);
 
   _pastDueLock(false);
@@ -13350,7 +14367,35 @@ async function _pastDueLoadMonthGrid(year, sid, openingMonths, studentData) {
     });
   }
 
-  const owedSet = new Set(openingMonths); // months that were recorded as owed at onboarding
+  // ── Source 3: openingOutstandingDues[] — multi-year manual onboarding ──
+  // When a student is manually onboarded with dues for MULTIPLE years (e.g. 2024-25 + 2025-26),
+  // each year's monthStatus is stored only inside this array (not in top-level monthStatus /
+  // previousYearMonthStatus). We find the matching entry and extract its N/A-PAID months.
+  // Also builds owedSet from DUE months if openingMonths array is empty for this year.
+  const _multiYearDues = Array.isArray(sData.openingOutstandingDues) ? sData.openingOutstandingDues : [];
+  let _multiYearOwedMonths = null; // will override owedSet if found
+  if (_multiYearDues.length > 0) {
+    const _matchEntry = _multiYearDues.find(entry => _normaliseAcademicYear(entry.year || '') === _normYear);
+    if (_matchEntry && _matchEntry.monthStatus && typeof _matchEntry.monthStatus === 'object') {
+      Object.entries(_matchEntry.monthStatus).forEach(([month, status]) => {
+        const fullName = _pdShortToFull[month] || month;
+        if (status === 'N/A-PAID' || status === 'PAID') {
+          paid.add(fullName);
+        }
+      });
+      // Build owed set from DUE entries of this specific year's monthStatus
+      // (overrides the passed openingMonths which only tracks the oldest year)
+      _multiYearOwedMonths = Object.entries(_matchEntry.monthStatus)
+        .filter(([, status]) => status === 'DUE')
+        .map(([month]) => _pdShortToFull[month] || month);
+    } else if (_matchEntry && Array.isArray(_matchEntry.unpaidMonths)) {
+      // Fallback: unpaidMonths list (full names stored at save time)
+      _multiYearOwedMonths = _matchEntry.unpaidMonths;
+    }
+  }
+
+  // Use per-year owed months from Source 3 if available; otherwise fall back to passed openingMonths
+  const owedSet = new Set(_multiYearOwedMonths !== null ? _multiYearOwedMonths : openingMonths);
 
   // Reset and re-render each pill
   const autoSelected = [];
@@ -13619,7 +14664,7 @@ function renderExcusedSection(params = {}) {
           <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2" width="22" height="22">
             <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
           </svg>
-          Excused Section
+          Fees Excused Students
         </div>
         <div class="page-sub">Zero-amount fee waiver with mandatory justification — generates formal EXCUSED receipt.</div>
       </div>
@@ -13686,7 +14731,7 @@ function renderExcusedSection(params = {}) {
               <input type="date" class="form-control" id="excusedDate">
             </div>
 
-            <button class="btn btn-primary btn-full" onclick="_excusedSave()" style="background:var(--success);color:#fff;box-shadow:0 2px 14px rgba(82,200,122,0.35)">
+            <button id="excusedSaveBtn" class="btn btn-primary btn-full" onclick="_excusedSave()" style="background:var(--success);color:#fff;box-shadow:0 2px 14px rgba(82,200,122,0.35)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 11l3 3L22 4"/></svg>
               Confirm Waiver &amp; Generate EXCUSED Receipt
             </button>
@@ -13698,7 +14743,7 @@ function renderExcusedSection(params = {}) {
       <div>
         <div id="excusedHelpCard" class="card" style="margin-bottom:16px">
           <div class="card-body" style="font-size:13px;color:var(--muted);line-height:1.8">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--success);margin-bottom:8px">Excused Section</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--success);margin-bottom:8px">Fees Excused Students</div>
             <div style="margin-bottom:8px">Waive specific monthly fees for a student at <strong style="color:var(--success)">₹0</strong> with mandatory justification. A formal EXCUSED receipt is generated and dues are cleared.</div>
             <div style="padding:10px;background:rgba(82,200,122,0.08);border:1px solid rgba(82,200,122,0.2);border-radius:8px;font-size:12px;color:var(--success)">
               ✅ All waiver transactions are audit-logged with the approver name, justification, and timestamp.
@@ -14060,6 +15105,13 @@ function _excusedToggleMonth(btn) {
 }
 
 async function _excusedSave() {
+  // DUPLICATE LOCK: disable button immediately on first click — same pattern as VLX-REF-001
+  const _excBtn = document.getElementById('excusedSaveBtn');
+  if (_excBtn) {
+    if (_excBtn.disabled) return; // already processing — block repeat clicks
+    _excBtn.disabled = true;
+    _excBtn.innerHTML = '<span style="opacity:0.7">⏳ Processing…</span>';
+  }
   showFormAlert('excusedAlert','','');
   const state   = window._excusedState;
   const student = state?.student;
@@ -14067,9 +15119,15 @@ async function _excusedSave() {
   const months  = state.months || [];
   if (!months.length) { showFormAlert('excusedAlert','Select at least one month to excuse.','danger'); return; }
   const reason  = (document.getElementById('excusedReason')?.value||'').trim();
-  if (!reason)  { showFormAlert('excusedAlert','Justification / reason is mandatory and cannot be blank.','danger'); return; }
+  if (!reason)  {
+    if (_excBtn) { _excBtn.disabled = false; _excBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 11l3 3L22 4"/></svg> Confirm Waiver &amp; Generate EXCUSED Receipt'; }
+    showFormAlert('excusedAlert','Justification / reason is mandatory and cannot be blank.','danger'); return;
+  }
   const date    = (document.getElementById('excusedDate')?.value||'').trim();
-  if (!date)    { showFormAlert('excusedAlert','Select a waiver date.','danger'); return; }
+  if (!date) {
+    if (_excBtn) { _excBtn.disabled = false; _excBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 11l3 3L22 4"/></svg> Confirm Waiver &amp; Generate EXCUSED Receipt'; }
+    showFormAlert('excusedAlert','Select a waiver date.','danger'); return;
+  }
 
   const approvedBy = currentProfile?.name || currentUser?.email || 'Principal';
   const receiptNumber = 'EXC-' + Date.now().toString(36).toUpperCase();
@@ -14080,14 +15138,28 @@ async function _excusedSave() {
   const _excStdRate = _excInfo?.rate || 0;
   const _amountWaived = _excStdRate * months.length;
 
+  const _excClassSection = (student.class || student.cls || '')
+    ? `${student.class || student.cls}${student.section ? ' – Section ' + student.section : ''}`
+    : '—';
+
   const tx = {
     type:           'excused_waiver',
     studentId:      student.id,
     studentName:    student.name || '',
     admissionNo:    student.admissionNumber || '',
+    admissionNumber: student.admissionNumber || '',
     class:          student.class || student.cls || '',
     section:        student.section || '',
     block:          student.block   || '',
+    // BUG-FIX (VLX013→VLX014): These fields were missing from excused_waiver docs,
+    // causing Paid Fee table and Dashboard Recent Transactions to show blanks for
+    // Class, Fee Head, Mode columns on excused entries.
+    classSection:   _excClassSection,
+    feeHead:        `EXCUSED WAIVER — ${months.join(', ')}`,
+    paymentMode:    'N/A — EXCUSED WAIVER',
+    parentName:     student.parentName || '',
+    contactNo:      student.contact || student.contactNo || student.phone || '',
+    recordedByName: currentProfile?.name || currentUser?.email || 'Principal',
     monthsExcused:  months,
     // SYNC FIX: mirror monthsExcused into monthsSelected — this is the field
     // selectFeeStudent() scans (academicYear === currentYear) to lock "already
@@ -14184,8 +15256,40 @@ async function _excusedSave() {
     _excusedShowReceipt(tx, student, months, date, reason, approvedBy);
     _excusedRenderCandidates(); // SYNC FIX (Fix 3): refresh candidate list immediately
     showToast('Waiver confirmed — EXCUSED receipt generated.','success');
+    // DUPLICATE LOCK: keep button permanently disabled after success.
+    // Form inputs also locked — user must use 'New Waiver' to start fresh.
+    if (_excBtn) {
+      _excBtn.disabled = true;
+      _excBtn.style.background = 'rgba(82,200,122,0.25)';
+      _excBtn.style.boxShadow = 'none';
+      _excBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 11l3 3L22 4"/></svg> ✅ Waiver Confirmed';
+    }
+    // Lock all form inputs in the excused form
+    ['excusedReason','excusedDate'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) { el.disabled = true; el.style.opacity = '0.5'; el.style.cursor = 'not-allowed'; }
+    });
+    // Lock month pills
+    document.querySelectorAll('#excusedMonthGrid .month-pill, #excusedMonthGrid button').forEach(b => {
+      b.disabled = true; b.style.pointerEvents = 'none'; b.style.opacity = '0.6';
+    });
+    // Show 'New Waiver' reset button
+    const _excFormWrap = document.getElementById('excusedForm');
+    if (_excFormWrap) {
+      const _newBtn = document.createElement('button');
+      _newBtn.className = 'btn btn-secondary btn-full';
+      _newBtn.style.marginTop = '12px';
+      _newBtn.textContent = '+ New Waiver';
+      _newBtn.onclick = () => renderExcusedSection();
+      _excFormWrap.appendChild(_newBtn);
+    }
   } catch(e) {
     showFormAlert('excusedAlert','Error saving waiver: ' + e.message,'danger');
+    // Re-enable button on error so user can retry
+    if (_excBtn) {
+      _excBtn.disabled = false;
+      _excBtn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><path d="M9 11l3 3L22 4"/></svg> Confirm Waiver &amp; Generate EXCUSED Receipt';
+    }
   }
 }
 
@@ -14285,7 +15389,7 @@ function openAddConcessionModal() {
           <div style="margin-top:12px;display:flex;gap:24px;padding-top:10px;border-top:1px solid var(--glass-border-lt)">
             <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Standard Fee</div><div id="_acmStd" style="font-size:17px;font-weight:700;color:var(--silver-lt)">—</div></div>
             <div style="color:var(--muted);align-self:center">→</div>
-            <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Concession Fee</div><div id="_acmNew" style="font-size:17px;font-weight:700;color:var(--gold-lt)">—</div></div>
+            <div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Fee After Concession</div><div id="_acmNew" style="font-size:17px;font-weight:700;color:var(--gold-lt)">—</div></div>
             <div id="_acmSave" style="align-self:center;font-size:12px;font-weight:600;color:var(--success);margin-left:auto"></div>
           </div>
           <div id="_acmExist" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(224,140,42,0.12);border:1px solid rgba(224,140,42,0.3);border-radius:8px;font-size:12px;color:#e8a050"></div>
@@ -14480,6 +15584,65 @@ async function _acmPick(sid) {
     window._acmLockedMonths = existActiveMonths.slice();
   }
   _acmInitMonthYear(); // renders grid with locks already in place
+
+  // VLX-REF-007 SYNC FIX: Lock months already PAID or EXCUSED in the concession grid.
+  // Concession cannot be applied retroactively to a month the student has already settled.
+  // Source: feeTransactions (same truth as Record Payment + Excused Section).
+  try {
+    const _curYrNorm   = _normaliseAcademicYear(_getCurrentAcademicYearStr());
+    const _shortToFull = {Jun:'June',Jul:'July',Aug:'August',Sep:'September',Oct:'October',Nov:'November',Dec:'December',Jan:'January',Feb:'February',Mar:'March',Apr:'April',May:'May'};
+    const _MMtoName    = {'01':'January','02':'February','03':'March','04':'April','05':'May','06':'June','07':'July','08':'August','09':'September','10':'October','11':'November','12':'December'};
+    const paidFullNames    = new Set();
+    const excusedFullNames = new Set();
+
+    const txSnap = await schoolCol('feeTransactions').where('studentId','==',sid).get();
+    txSnap.docs.forEach(doc => {
+      const d = doc.data();
+      if (_normaliseAcademicYear(d.academicYear) !== _curYrNorm) return;
+      if (d.type === 'excused_waiver') {
+        if (Array.isArray(d.monthsExcused))  d.monthsExcused.forEach(m => excusedFullNames.add(m));
+        if (Array.isArray(d.monthsSelected)) d.monthsSelected.forEach(m => excusedFullNames.add(m));
+      } else {
+        if (Array.isArray(d.monthsSelected)) d.monthsSelected.forEach(m => paidFullNames.add(m));
+      }
+    });
+
+    // Also honour Excel-import N/A-PAID for current-year students
+    const studentYearNorm = _normaliseAcademicYear(s.academicYear || '');
+    if ((!studentYearNorm || studentYearNorm === _curYrNorm) && s.monthStatus && typeof s.monthStatus === 'object') {
+      Object.entries(s.monthStatus).forEach(([m, st]) => {
+        if (st === 'N/A-PAID' || st === 'PAID') paidFullNames.add(_shortToFull[m] || m);
+      });
+    }
+
+    // Apply visual lock to rendered labels in the concession month grid
+    document.querySelectorAll('#_acmMonthGrid label').forEach(lbl => {
+      const key    = lbl.dataset.mkey || '';       // format YYYY-MM
+      const mm     = (key.split('-')[1] || '');
+      const fullName = _MMtoName[mm] || '';
+      if (!fullName) return;
+
+      if (excusedFullNames.has(fullName)) {
+        const cb = lbl.querySelector('input');
+        if (cb) { cb.checked = false; cb.disabled = true; }
+        lbl.style.cssText += ';background:rgba(82,200,122,0.10);border-color:rgba(82,200,122,0.35);color:var(--success);opacity:0.72;cursor:not-allowed;pointer-events:none;';
+        lbl.title = fullName + ' — already EXCUSED (waived). Cannot apply concession.';
+        const existSpan = lbl.querySelector('span');
+        if (existSpan) existSpan.remove();
+        lbl.insertAdjacentHTML('beforeend', '<span style="font-size:9px;margin-left:auto;color:var(--success)">✓ EXCUSED</span>');
+      } else if (paidFullNames.has(fullName)) {
+        const cb = lbl.querySelector('input');
+        if (cb) { cb.checked = false; cb.disabled = true; }
+        lbl.style.cssText += ';background:rgba(82,200,122,0.07);border-color:rgba(82,200,122,0.25);color:var(--success);opacity:0.65;cursor:not-allowed;pointer-events:none;';
+        lbl.title = fullName + ' — already PAID. Concession cannot be applied to a settled month.';
+        const existSpan = lbl.querySelector('span');
+        if (existSpan) existSpan.remove();
+        lbl.insertAdjacentHTML('beforeend', '<span style="font-size:9px;margin-left:auto;color:var(--success)">✓ PAID</span>');
+      }
+    });
+  } catch(e) {
+    console.warn('[VLX-007] Concession paid-month lock failed:', e.message);
+  }
 }
 
 function _acmCalc() {
