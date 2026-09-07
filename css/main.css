@@ -503,47 +503,8 @@ td.muted { color:var(--muted); }
   #header { padding:8px 12px; gap:10px; }
   .search-wrap { max-width:100%; }
   #content { padding:12px; }
-  /* ══════════════════════════════════════════════════════════════════════════
-     M4 — TABLES FIT THE PHONE. NO SIDEWAYS SCROLLING.
-
-     Three things were forcing a floor wider than the screen, and removing any
-     one of them alone does nothing:
-
-       table { min-width:520px }   right here — every table, on a 375px screen
-       th { white-space:nowrap }   line 431 — nine headers that refuse to wrap
-                                   set a hard minimum no CSS below them can beat
-       min-width:900px             inline on the Bulk Admit preview table
-                                   (bulk-admit.js:38), which beats a stylesheet
-                                   rule unless this one is !important
-
-     So the columns are allowed to wrap now instead of pushing the table wide.
-     Rows get taller — a nine-column row is genuinely a lot to show on a phone —
-     but the content is all reachable by scrolling the way a page is supposed to
-     scroll, rather than by dragging each table sideways to find the column you
-     wanted.
-
-     overflow-wrap:anywhere is what stops a long unbroken token (a receipt number
-     like RCP-ED6DC917-MTLDOOHK) from re-widening the table on its own.
-
-     .tbl-wrap KEEPS overflow-x:auto deliberately. It is now a safety net rather
-     than the mechanism: if some table still cannot fit, it scrolls inside its
-     own card instead of breaking the page open sideways. Nothing should reach
-     it, but the failure mode if something does is the old behaviour, contained.
-
-     .data-table is listed alongside the bare element selectors on purpose. Its
-     rules live LATER in this file and carry higher specificity, so a plain
-     `th {}` here loses to them and the padding silently stays at desktop size on
-     exactly the tables that most need shrinking.
-
-     Desktop is untouched — all of this is inside max-width:768px.
-     ══════════════════════════════════════════════════════════════════════════ */
   .tbl-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  table, .data-table { min-width:0 !important; width:100%; }
-  th, .data-table th {
-    white-space:normal; padding:8px 6px; font-size:10px; letter-spacing:0.3px;
-  }
-  td, .data-table td { padding:9px 6px; font-size:12px; }
-  th, td, .data-table th, .data-table td { overflow-wrap:anywhere; word-break:break-word; }
+  table { min-width:520px; }
   .stats-grid { grid-template-columns:1fr 1fr; gap:10px; }
   .page-title { font-size:22px; }
   .page-actions { flex-wrap:wrap; gap:8px; }
